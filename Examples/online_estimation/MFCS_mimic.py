@@ -22,7 +22,7 @@ from skimage import io
 
 ##Simulate an Experiment by using the metadata from an real Experiment - F7 in thise case
 path = Simulation_path
-Exp = Experiment(path, exp_id)  #load experiment 7
+Exp = Experiment(path, exp_id)  #load experiment 
 y = Yeast()
 hours = 8
 t_grid = np.linspace(0,hours, hours*60)     #measuring times * 60 means 1 timepoint each minute

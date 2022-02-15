@@ -5,3 +5,4 @@ plotly
 lmfit
 sympy
 odfpy
+kaleido

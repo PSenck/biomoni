@@ -2,14 +2,18 @@
 
 url = "opc.tcp://127.0.0.1:4848"    #OPC server url
 
-##Windows 
-Simulation_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located
-exp_id = "F7"
-
-##Linux
+#Linux
+Simulation_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten" #path in which the experiment to be simulated is located
 Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" #path where Results (data from MFCS) are stored
-##windows
+image_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/images" #path were images from laborloop are stored
+
+
+##Windows 
+#Simulation_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located
 #Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"    #path where Results (data from MFCS) are stored
+#image_path = r"P:\Code\biomoni\Messdaten\images" #path were images from laborloop are stored
+
+exp_id = "F7"   #The Experiment to simulate
 
 data_name = "data_1"        #name of the csv file in which data will be saved
 
@@ -39,6 +43,38 @@ CO2 = ('ns=2;s="Value_CO2"',"Value",0),
 CO2_pressure = ('ns=2;s="CO2_pressure"',"Value",1.058),
 ts = ('ns=2;s="Value_PDatTime"',"Value",0)
 )
+
+
+
+#In the following are Settings to create an Experiment object and settings to estimate, these are only used in the laborloop
+
+kwargs_experiment = {       #setting to create Experiment object
+
+"online_est" : dict (
+
+
+    exp_id = "current_ferm",     #identifier to read correct data from the metadata
+    meta_path = "metadata_OPCUA.ods",    #metadata location within path
+    types = {"on_CO2" : data_name},
+    index_ts = {"on_CO2" : 0},
+    read_csv_settings = {"on_CO2" : dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")},
+    to_datetime_settings = {"on_CO2" : dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce") },
+    calc_rate =("on_CO2", "BASET"),
+    read_excel_settings = dict(engine = "odf")
+
+    )
+}
+
+kwargs_estimate = {         #settings to estimate
+
+"online_est" : dict (
+    tau = 1, 
+    max_nfev = 30      #max function evaluations, maximum of iterations done in order to estimate
+    )
+
+}
+
+
 
 
 
@@ -77,4 +113,101 @@ nID_HM_4 = {
     'PDatTime':["0:Objects","0:Units","0:HM_4","0:Variables","0:PDatTime","0:Value"],           
     'pHo_1':["0:Objects","0:Units","0:HM_4","0:Variables","0:pHo_1","0:Value_pHo_1"],
     'pO2o_1':["0:Objects","0:Units","0:HM_4","0:Variables","0:pO2o_1","0:Value_pO2o_1"],
+}
+
+
+
+#For the other Fermenters
+
+#FM_1
+nID_FM_1 = {
+    'ACIDT': ["0:Objects","0:Units","0:FM_1","0:Variables","0:BALANCE_B1","0:Value_BALANCE_B1"],
+    'BALANCE_A1': ["0:Objects","0:Units","0:FM_1","0:Variables","0:BALANCE_A1","0:Value_BALANCE_A1"],
+    'BALANCE_B1':["0:Objects","0:Units","0:FM_1","0:Variables","0:BALANCE_B1","0:Value_BALANCE_B1"],
+    'BASET_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:BASET_1","0:Value_BASET_1"],
+    'ECO2_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:ECO2_1","0:Value_ECO2_1"],
+    'EO2_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:EO2_1","0:Value_EO2_1"],
+    'EXT_A1':["0:Objects","0:Units","0:FM_1","0:Variables","0:EXT_A1","0:Value_EXT_A1"],
+    'EXT_B1':["0:Objects","0:Units","0:FM_1","0:Variables","0:EXT_B1","0:Value_EXT_B1"],
+    'FOAMT_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:FOAMT_1","0:Value_FOAMT_1"],
+    'MFC_B1':["0:Objects","0:Units","0:FM_1","0:Variables","0:MFC_B1","0:Value_MFC_B1"],
+    'MFC_C1':["0:Objects","0:Units","0:FM_1","0:Variables","0:MFC_C1","0:Value_MFC_C1"],
+    'MFC_D1':["0:Objects","0:Units","0:FM_1","0:Variables","0:MFC_D1","0:Value_MFC_D1"],
+    'O2SPT_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:O2SPT_1","0:Value_O2SPT_1"],
+    'PUMPT_A1':["0:Objects","0:Units","0:FM_1","0:Variables","0:PUMPT_A1","0:Value_PUMPT_A1"],
+    'REDOX_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:REDOX_1","0:Value_REDOX_1"],
+    'SUBST_A1':["0:Objects","0:Units","0:FM_1","0:Variables","0:SUBST_A1","0:Value_SUBST_A1"],
+    'SUBST_B1':["0:Objects","0:Units","0:FM_1","0:Variables","0:SUBST_B1","0:Value_SUBST_B1"],
+    'SUBST_C1':["0:Objects","0:Units","0:FM_1","0:Variables","0:SUBST_C1","0:Value_SUBST_C1"],
+    'TURB_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:TURB_1","0:Value_TURB_1"],
+    'VALVET_A1':["0:Objects","0:Units","0:FM_1","0:Variables","0:VALVET_A1","0:Value_VALVET_A1"],
+    'VALVET_C1':["0:Objects","0:Units","0:FM_1","0:Variables","0:VALVET_C1","0:Value_VALVET_C1"],
+    'VALVET_D1':["0:Objects","0:Units","0:FM_1","0:Variables","0:VALVET_D1","0:Value_VALVET_D1"],
+    'VALVE_A1':["0:Objects","0:Units","0:FM_1","0:Variables","0:VALVE_A1","0:Value_VALVE_A1"],
+    'VALVE_C1':["0:Objects","0:Units","0:FM_1","0:Variables","0:VALVE_C1","0:Value_VALVE_C1"],
+    'VALVE_D1':["0:Objects","0:Units","0:FM_1","0:Variables","0:VALVE_D1","0:Value_VALVE_D1"],
+    'pHo_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:pHo_1","0:Value_pHo_1"],
+    'pO2o_1':["0:Objects","0:Units","0:FM_1","0:Variables","0:pO2o_1","0:Value_pO2o_1"],
+}
+
+#FM_2
+nID_FM_2 = {
+    'ACIDT': ["0:Objects","0:Units","0:FM_2","0:Variables","0:BALANCE_B1","0:Value_BALANCE_B1"],
+    'BALANCE_A1': ["0:Objects","0:Units","0:FM_2","0:Variables","0:BALANCE_A1","0:Value_BALANCE_A1"],
+    'BALANCE_B1':["0:Objects","0:Units","0:FM_2","0:Variables","0:BALANCE_B1","0:Value_BALANCE_B1"],
+    'BASET_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:BASET_1","0:Value_BASET_1"],
+    'ECO2_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:ECO2_1","0:Value_ECO2_1"],
+    'EO2_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:EO2_1","0:Value_EO2_1"],
+    'EXT_A1':["0:Objects","0:Units","0:FM_2","0:Variables","0:EXT_A1","0:Value_EXT_A1"],
+    'EXT_B1':["0:Objects","0:Units","0:FM_2","0:Variables","0:EXT_B1","0:Value_EXT_B1"],
+    'FOAMT_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:FOAMT_1","0:Value_FOAMT_1"],
+    'MFC_B1':["0:Objects","0:Units","0:FM_2","0:Variables","0:MFC_B1","0:Value_MFC_B1"],
+    'MFC_C1':["0:Objects","0:Units","0:FM_2","0:Variables","0:MFC_C1","0:Value_MFC_C1"],
+    'MFC_D1':["0:Objects","0:Units","0:FM_2","0:Variables","0:MFC_D1","0:Value_MFC_D1"],
+    'O2SPT_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:O2SPT_1","0:Value_O2SPT_1"],
+    'PUMPT_A1':["0:Objects","0:Units","0:FM_2","0:Variables","0:PUMPT_A1","0:Value_PUMPT_A1"],
+    'REDOX_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:REDOX_1","0:Value_REDOX_1"],
+    'SUBST_A1':["0:Objects","0:Units","0:FM_2","0:Variables","0:SUBST_A1","0:Value_SUBST_A1"],
+    'SUBST_B1':["0:Objects","0:Units","0:FM_2","0:Variables","0:SUBST_B1","0:Value_SUBST_B1"],
+    'SUBST_C1':["0:Objects","0:Units","0:FM_2","0:Variables","0:SUBST_C1","0:Value_SUBST_C1"],
+    'TURB_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:TURB_1","0:Value_TURB_1"],
+    'VALVET_A1':["0:Objects","0:Units","0:FM_2","0:Variables","0:VALVET_A1","0:Value_VALVET_A1"],
+    'VALVET_C1':["0:Objects","0:Units","0:FM_2","0:Variables","0:VALVET_C1","0:Value_VALVET_C1"],
+    'VALVET_D1':["0:Objects","0:Units","0:FM_2","0:Variables","0:VALVET_D1","0:Value_VALVET_D1"],
+    'VALVE_A1':["0:Objects","0:Units","0:FM_2","0:Variables","0:VALVE_A1","0:Value_VALVE_A1"],
+    'VALVE_C1':["0:Objects","0:Units","0:FM_2","0:Variables","0:VALVE_C1","0:Value_VALVE_C1"],
+    'VALVE_D1':["0:Objects","0:Units","0:FM_2","0:Variables","0:VALVE_D1","0:Value_VALVE_D1"],
+    'pHo_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:pHo_1","0:Value_pHo_1"],
+    'pO2o_1':["0:Objects","0:Units","0:FM_2","0:Variables","0:pO2o_1","0:Value_pO2o_1"],
+}
+
+#HM_3
+nID_HM_3 = {
+    'ACIDT': ["0:Objects","0:Units","0:HM_3","0:Variables","0:BALANCE_B1","0:Value_BALANCE_B1"],
+    'BALANCE_A1': ["0:Objects","0:Units","0:HM_3","0:Variables","0:BALANCE_A1","0:Value_BALANCE_A1"],
+    'BALANCE_B1':["0:Objects","0:Units","0:HM_3","0:Variables","0:BALANCE_B1","0:Value_BALANCE_B1"],
+    'BASET_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:BASET_1","0:Value_BASET_1"],
+    'ECO2_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:ECO2_1","0:Value_ECO2_1"],
+    'EO2_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:EO2_1","0:Value_EO2_1"],
+    'EXT_A1':["0:Objects","0:Units","0:HM_3","0:Variables","0:EXT_A1","0:Value_EXT_A1"],
+    'EXT_B1':["0:Objects","0:Units","0:HM_3","0:Variables","0:EXT_B1","0:Value_EXT_B1"],
+    'FOAMT_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:FOAMT_1","0:Value_FOAMT_1"],
+    'MFC_B1':["0:Objects","0:Units","0:HM_3","0:Variables","0:MFC_B1","0:Value_MFC_B1"],
+    'MFC_C1':["0:Objects","0:Units","0:HM_3","0:Variables","0:MFC_C1","0:Value_MFC_C1"],
+    'MFC_D1':["0:Objects","0:Units","0:HM_3","0:Variables","0:MFC_D1","0:Value_MFC_D1"],
+    'O2SPT_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:O2SPT_1","0:Value_O2SPT_1"],
+    'PUMPT_A1':["0:Objects","0:Units","0:HM_3","0:Variables","0:PUMPT_A1","0:Value_PUMPT_A1"],
+    'REDOX_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:REDOX_1","0:Value_REDOX_1"],
+    'SUBST_A1':["0:Objects","0:Units","0:HM_3","0:Variables","0:SUBST_A1","0:Value_SUBST_A1"],
+    'SUBST_B1':["0:Objects","0:Units","0:HM_3","0:Variables","0:SUBST_B1","0:Value_SUBST_B1"],
+    'SUBST_C1':["0:Objects","0:Units","0:HM_3","0:Variables","0:SUBST_C1","0:Value_SUBST_C1"],
+    'TURB_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:TURB_1","0:Value_TURB_1"],
+    'VALVET_A1':["0:Objects","0:Units","0:HM_3","0:Variables","0:VALVET_A1","0:Value_VALVET_A1"],
+    'VALVET_C1':["0:Objects","0:Units","0:HM_3","0:Variables","0:VALVET_C1","0:Value_VALVET_C1"],
+    'VALVET_D1':["0:Objects","0:Units","0:HM_3","0:Variables","0:VALVET_D1","0:Value_VALVET_D1"],
+    'VALVE_A1':["0:Objects","0:Units","0:HM_3","0:Variables","0:VALVE_A1","0:Value_VALVE_A1"],
+    'VALVE_C1':["0:Objects","0:Units","0:HM_3","0:Variables","0:VALVE_C1","0:Value_VALVE_C1"],
+    'VALVE_D1':["0:Objects","0:Units","0:HM_3","0:Variables","0:VALVE_D1","0:Value_VALVE_D1"],
+    'pHo_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:pHo_1","0:Value_pHo_1"],
+    'pO2o_1':["0:Objects","0:Units","0:HM_3","0:Variables","0:pO2o_1","0:Value_pO2o_1"],
 }

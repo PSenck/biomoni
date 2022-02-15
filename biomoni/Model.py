@@ -53,7 +53,7 @@ class Model:
             assert isinstance(value, (int, float)), "value must be int or float."
             self.p[name].value = value
         if vary is not None:
-            assert isinstance(vary, bool), "vary must be True or False."
+            assert isinstance(vary, bool), "vary must be a boolean. Not {0} of type {1}".format(vary, type(vary))
             self.p[name].vary = vary
         if min is not None:
             assert isinstance(min, (int, float)), "min must be int or float."

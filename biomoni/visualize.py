@@ -65,7 +65,7 @@ def visualize(data_1, data_2 = None, title = None
 
 
 
-
+    available_columns = []
     fig = make_subplots(specs = [[{"secondary_y" : True}]])
 
     for i, data_list in data_dict.items():
@@ -80,20 +80,23 @@ def visualize(data_1, data_2 = None, title = None
                     secondary_y_flag = col in secondary_y_cols
                     if col in column_dict.keys():
 
+                        available_columns.append(col)
                         fig.add_trace(
                             go.Scatter(x= df.index, y= df[col], name = col+ suffix[i], mode = mode[i], marker = dict(color = column_dict[col], size = 5, symbol = "x")
                             )
                             , secondary_y= secondary_y_flag
                         )
     
-
-    cols_y1 = [col for col in column_dict.keys() if col not in secondary_y_cols]            
-    cols_y2 = [col for col in column_dict.keys() if col in secondary_y_cols]
+    available_columns = set(available_columns)
+    cols_y1 = [col for col in available_columns if col not in secondary_y_cols]            
+    cols_y2 = [col for col in available_columns if col in secondary_y_cols]
     fig.update_yaxes(title_text= str(cols_y1), secondary_y=False , title_standoff = 20 )
     fig.update_yaxes(title_text= str(cols_y2), secondary_y=True, title_standoff = 20)
 
     fig.update_xaxes(title_text = "Time [h]")
     fig.update_layout(title_text = title , title_x=0.5)
     fig.update_layout(legend=dict(x = 1))
-    fig.show()
+    #fig.show()
+
+    return fig
 
