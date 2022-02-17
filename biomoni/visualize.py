@@ -8,7 +8,8 @@ import plotly.graph_objs as go
 def visualize(data_1, data_2 = None, title = None
 , column_dict = {"BASET_rate" : "cyan", "cX" : "red", "cS" : "green", "cE" : "blue", "CO2" : "orange"}
 , suffix_1 = "", suffix_2 = "_fitted", mode_1 = "markers", mode_2 = "lines"
-, secondary_y_cols = ["CO2", "BASET_rate"]): 
+, secondary_y_cols = ["CO2", "BASET_rate"], yaxis_type = "linear", sec_yaxis_type = "linear"
+): 
     """ Function to visualize experimental data and simulated data of one experiment either alone or in conjunction. It is necessary that the experimental data and the simulated data are from the same experiment to yield meaningful results. 
     The given data must be either a single pd.DataFrame: df or a list or a dict with pd.DataFrame objects, for example a dict with "off" : df1, "on" : df2 and "CO2" : df3. 
 
@@ -90,8 +91,8 @@ def visualize(data_1, data_2 = None, title = None
     available_columns = set(available_columns)
     cols_y1 = [col for col in available_columns if col not in secondary_y_cols]            
     cols_y2 = [col for col in available_columns if col in secondary_y_cols]
-    fig.update_yaxes(title_text= str(cols_y1), secondary_y=False , title_standoff = 20 )
-    fig.update_yaxes(title_text= str(cols_y2), secondary_y=True, title_standoff = 20)
+    fig.update_yaxes(title_text= str(cols_y1), secondary_y=False , title_standoff = 20 , type = yaxis_type)
+    fig.update_yaxes(title_text= str(cols_y2), secondary_y=True, title_standoff = 20, type = sec_yaxis_type)
 
     fig.update_xaxes(title_text = "Time [h]")
     fig.update_layout(title_text = title , title_x=0.5)
