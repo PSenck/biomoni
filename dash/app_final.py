@@ -33,9 +33,11 @@ Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"        #pfad kann in settings.p
 #Result_path = "/home/paul/Desktop/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
 
 
+
 sub_paths = next(os.walk(Result_path))[1]       #yields the subsirectory in the given path
 newest_results_dir = max([os.path.join(Result_path,i) for i in sub_paths], key=os.path.getmtime) #gives newest subdirectory
 exp_dir_manual = newest_results_dir
+kwargs_experiment["online_est"]["exp_dir_manual"] = exp_dir_manual
 
 colors = {
     "background": "oxy",
@@ -55,7 +57,7 @@ estimation_options = kwargs_estimate["online_est"]         #use ur options to es
 
 
 #read the csv file with settings
-Exp_init = Exp_class(path = Result_path, exp_dir_manual = exp_dir_manual, **experiment_options)
+Exp_init = Exp_class(path = Result_path, **experiment_options)
 y_init = model_class()
 y_init.estimate(Exp_init, **estimation_options) 
 all_vars = set([*measurement_vars, *simulated_vars])    #All variables only once, used to display the options in the dropdown at the initial callback
@@ -307,11 +309,11 @@ def create_data(n_intervals, hours, n_clicks, parest_mode, data, columns):
         print("Initial callback was executed")
 
     if last_input != '':
-        Exp = Exp_class(path = Result_path, exp_dir_manual = exp_dir_manual, **experiment_options)
+        Exp = Exp_class(path = Result_path, **experiment_options)
         y = model_class()
         params = pd.DataFrame(data, columns=[c['name'] for c in columns]).set_index("name")
         for p, row in params.iterrows():
-            if row["vary"] in ["True", "true"]:
+            if row["vary"] in ["True", "true"]: 
                 row["vary"] = True
             elif row["vary"] in ["False", "false"]:
                 row["vary"] = False
