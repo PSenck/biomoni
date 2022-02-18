@@ -25,20 +25,33 @@ import json
 
 
 
-#external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]   #necessary?
-
-
-
+#Getting the main path 
 Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"        #pfad kann in settings.py
-#Result_path = "/home/paul/Desktop/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
+Result_path = "/home/paul/Desktop/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
 
-
+path = Result_path
 
 sub_paths = next(os.walk(Result_path))[1]       #yields the subsirectory in the given path
 newest_results_dir = max([os.path.join(Result_path,i) for i in sub_paths], key=os.path.getmtime) #gives newest subdirectory
-exp_dir_manual = newest_results_dir
-kwargs_experiment["online_est"]["exp_dir_manual"] = exp_dir_manual
+exp_dir_manual = newest_results_dir     #manually given subdirectory with measurement data because exp_id does not match with the actual directory in this case
+kwargs_experiment["online_est"]["exp_dir_manual"] = exp_dir_manual      #add the directory to the key word arguments
 
+#This code block are asignments, in order to work with your individual data, use your Experiment class and the respective options to run their constructors
+Exp_class = Experiment      #assign your Experiment class to Exp_class
+model_class = Yeast         #assign your Model class to model_class
+experiment_options = kwargs_experiment["online_est"]       #use ur options to create an Experiment
+estimation_options = kwargs_estimate["online_est"]         #use ur options to estimate
+
+#create Experiment object and Model object with respective settings
+Exp_init = Exp_class(path, **experiment_options)
+y_init = model_class()
+y_init.estimate(Exp_init, **estimation_options) 
+
+all_vars = set([*measurement_vars, *simulated_vars])    #All variables only once, used to display the options in the dropdown at the initial callback
+
+
+
+#color dict to style your layout
 colors = {
     "background": "oxy",
     "text": "green",
@@ -47,24 +60,11 @@ colors = {
     "table_background" : "grey"
 }
 
-#This code block are asignments, in order to work with your individual data, use your Experiment class and the respective options to run their constructors
-Exp_class = Experiment      #assign your Experiment class to Exp_class
-model_class = Yeast         #assign your Model class to model_class
-experiment_options = kwargs_experiment["online_est"]       #use ur options to create an Experiment
-estimation_options = kwargs_estimate["online_est"]         #use ur options to estimate
-
-
-
-
-#read the csv file with settings
-Exp_init = Exp_class(path = Result_path, **experiment_options)
-y_init = model_class()
-y_init.estimate(Exp_init, **estimation_options) 
-all_vars = set([*measurement_vars, *simulated_vars])    #All variables only once, used to display the options in the dropdown at the initial callback
+#external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]   #external stylesheets to style your layout
+#cache = diskcache.Cache("./cache") #options for long_callback with cache
+#long_callback_manager = DiskcacheLongCallbackManager(cache)    #options for long_callback with cache
 
 #Create dash app
-#cache = diskcache.Cache("./cache")
-#long_callback_manager = DiskcacheLongCallbackManager(cache)
 app = dash.Dash(__name__)     #external_stylesheets = external_stylesheets      #, long_callback_manager = long_callback_manager
 
 
@@ -309,7 +309,7 @@ def create_data(n_intervals, hours, n_clicks, parest_mode, data, columns):
         print("Initial callback was executed")
 
     if last_input != '':
-        Exp = Exp_class(path = Result_path, **experiment_options)
+        Exp = Exp_class(path, **experiment_options)
         y = model_class()
         params = pd.DataFrame(data, columns=[c['name'] for c in columns]).set_index("name")
         for p, row in params.iterrows():
@@ -359,7 +359,7 @@ def create_data(n_intervals, hours, n_clicks, parest_mode, data, columns):
 
 
 if __name__ == "__main__":
-    app.run_server(host='localhost' , port="7777",  dev_tools_hot_reload=False, debug = False)     #debug=True, host='localhost' , host="0.0.0.0"
+    app.run_server(host='localhost' , port="7777",  dev_tools_hot_reload=False, debug = True)     #debug=True, host='localhost' , host="0.0.0.0"
 
 # visit http://localhost:7777/ in your web browser.
 

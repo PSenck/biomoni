@@ -1,0 +1,14 @@
+https://dash.plotly.com/dash-core-components/tabs
+
+https://plotly.com/dash/azure/
+
+
+https://medium.com/swlh/deploy-a-dash-application-in-azure-using-docker-ed46c4b9d2b2
+
+https://www.phillipsj.net/posts/deploying-dash-to-azure-app-service/
+
+portal.azure.com
+
+
+
+https://stackoverflow.com/questions/50213761/changing-visibility-of-a-dash-component-by-updating-other-component
