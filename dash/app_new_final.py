@@ -26,13 +26,15 @@ import json
 
 #Getting the path
 Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"        #pfad kann in settings.py
-Result_path = "/home/paul/Desktop/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
+Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
+
+
 
 path = Result_path
 
 #select your variables to be displayed
-measurement_vars = Variables["typ1"]["measurement_vars"]        #typ2
-simulated_vars = Variables["typ1"]["simulated_vars"]
+measurement_vars = Variables["typ2"]["measurement_vars"]        #typ2
+simulated_vars = Variables["typ2"]["simulated_vars"]
 
 #This code block finds the path which was last modified within Result_path
 sub_paths = next(os.walk(Result_path))[1]       #yields the subsirectory in the given path
@@ -46,10 +48,10 @@ model_class = Yeast         #assign your Model class to model_class
 experiment_options = kwargs_experiment["typ1"]       #use ur options to create an Experiment
 estimation_options = kwargs_estimate["typ1"]         #use ur options to estimate
 
-# #Using on, off, CO2 data from F7
-# path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten"
-# experiment_options = kwargs_experiment["typ2"]
-# estimation_options = kwargs_estimate["typ2"]
+#Using on, off, CO2 data from F7
+path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten"
+experiment_options = kwargs_experiment["typ2"]
+estimation_options = kwargs_estimate["typ2"]
 
 #create Experiment object and Model object with respective settings
 Exp_init = Exp_class(path, **experiment_options)
