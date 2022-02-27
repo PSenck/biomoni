@@ -25,7 +25,7 @@ import json
 
 
 #Getting the path
-Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"        #pfad kann in settings.py
+Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"        #path in settings.py?
 Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
 
 
