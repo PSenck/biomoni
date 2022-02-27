@@ -6,3 +6,12 @@ lmfit
 sympy
 odfpy
 kaleido
+
+#For dash 
+
+openpyxl
+dash
+diskcache 
+multiprocess 
+psutil
+
