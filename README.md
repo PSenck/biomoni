@@ -1,4 +1,5 @@
 A toolbox to automate and facilitate Biomonitoring.
+see the documentation [here](https://htmlpreview.github.io/?https://raw.githubusercontent.com/PSenck/biomoni/main/Docs/_build/html/biomoni.html#)
 
 To install the package on your machine follow the instructions in [Description](Description.md)
 
