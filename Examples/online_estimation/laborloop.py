@@ -23,7 +23,7 @@ for p in y.p.keys():
     estimated_params[p] = []
 estimated_params = pd.DataFrame(estimated_params)
 
-now = datetime.now().strftime("%d.%m.%Y_%H:%M")
+now = datetime.now().strftime("%d.%m.%Y %H-%M-%S")
 param_filename = "estimated_params_" + now
 
 param_file = os.path.join(newest_results_dir, param_filename) 
@@ -54,7 +54,7 @@ while True:
     #visualize(Exp, sim, column_dict = {"BASET_rate" : "cyan", "CO2" : "orange"}, secondary_y_cols = ["CO2"])
     figure_list.append(visualize(Exp,sim))
 
-    now = datetime.now().strftime("%d.%m.%Y %H:%M:%S") 
+    now = datetime.now().strftime("%d.%m.%Y %H-%M-%S") 
 
     appendix = {"ts" : now }
     for p, value in y.p.items():
