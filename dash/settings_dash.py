@@ -20,7 +20,7 @@ kwargs_experiment = {       #setting to create Experiment object
 
     exp_id = "current_ferm",     #identifier to read correct data from the metadata
     meta_path = "metadata_OPCUA.ods",    #metadata location within path
-    types = {"on_CO2" : "data_1"},
+    types = {"on_CO2" : "data.csv"},
     index_ts = {"on_CO2" : 0},
     read_csv_settings = {"on_CO2" : dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")},
     to_datetime_settings = {"on_CO2" : dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce") },

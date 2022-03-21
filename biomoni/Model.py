@@ -130,6 +130,12 @@ class Model:
         if settings_dict_given is not None:
             settings_dict = settings_dict_given
 
+        param_vary_true_list = []       #generate a list with all parameters that are set as fit parameters (vary = True), this is done to compare the length of it with the numbe rof measurement points. If the number of measurement points is less than the number of fit parameters, the optimization wont work and should raise an Error (CustomEstimationError).
+        for i in list(p):
+            if p[i].vary == True:
+                param_vary_true_list.append(i)
+        self.param_vary_true_list = param_vary_true_list
+
 
         start = time.time()
         result = minimize(self.residuals, p, args=(datasets_dict,  settings_dict, tau, kwargs_solve_ivp), method = method, nan_policy = nan_policy, **fit_kws)
@@ -314,3 +320,8 @@ class Model:
             statistics_all_exp["STDDEV"] = STDDEV
 
         return statistics_single_exp, statistics_all_exp
+
+
+class CustomEstimationError(TypeError):
+    "This Error is is raised if the length of the data points in the measurement data is smaller than the fit parameters (vary == True)"
+    pass

@@ -1,25 +1,50 @@
-#Settings required to build an OPC server, and an OPC client
-
-url = "opc.tcp://127.0.0.1:4848"    #OPC server url
-
+##Settings for MFCS_mimic, Data_collector, Laborloop routine,
+#This is the Settings script for the 1. MFCS_mimic, 2. Data_collector, 3. Laborloop routine, the first thing you have to do when you start is to adapt your paths (Simulation_path and Result_path)
 #Linux
-Simulation_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten" #path in which the experiment to be simulated is located
-Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" #path where Results (data from MFCS) are stored
-image_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/images" #path were images from laborloop are stored
-
+Simulation_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten" #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Simulation_path
+Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
 
 ##Windows 
-#Simulation_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located
-#Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"    #path where Results (data from MFCS) are stored
-#image_path = r"P:\Code\biomoni\Messdaten\images" #path were images from laborloop are stored
+#Simulation_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Simulation_path
+#Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"    #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
 
-exp_id = "F7"   #The Experiment to simulate
 
-data_name = "data_1"        #name of the csv file in which data will be saved
+exp_id = "F7"   #The Experiment to simulate, within Simulation_path
+data_name = "data.csv"        #name of the csv file in which data will be saved
+sample_interval = 60    #Time in sec in which a measured value is generated (server) or a measured value is read (client). 
 
-sample_interval = 60    #Time in sec in which a measured value is generated (server) or a measured value is read (client). Measurement value generation and reading is equal is this case because otherwise timestamps would not fit the measurement values in a logical manner and would thus yield wrong derivatives when calculating the base_rate for example.
+#In the following are Settings to create an Experiment (kwargs_experiment) object and settings to estimate (kwargs_estimate), these are only used in the laborloop
+kwargs_experiment = {       #setting to create Experiment object
 
-#Server settings
+"online_est" : dict (
+
+
+    exp_id = "current_ferm",     #identifier to read correct data from the metadata
+    meta_path = "metadata_OPCUA.ods",    #metadata location within path
+    types = {"on_CO2" : data_name},
+    index_ts = {"on_CO2" : 0},
+    read_csv_settings = {"on_CO2" : dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")},
+    to_datetime_settings = {"on_CO2" : dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce") },
+    calc_rate =("on_CO2", "BASET"),
+    read_excel_settings = dict(engine = "odf")
+
+    )
+}
+
+kwargs_estimate = {         #settings to estimate
+
+"online_est" : dict (
+    tau = 1, 
+    max_nfev = 30      #max function evaluations, maximum of iterations done in order to estimate
+    )
+}
+
+
+#Settings required to build an OPC server, and an OPC client
+
+url = "opc.tcp://127.0.0.1:4848"    #OPC server url and client
+
+#Server settings for the MFCS_mimic module, create Variables and values that are getting returned from the Sartorius MFCS (fake) Unit 
 #Units identity
 units_id = dict(
 FM_1 = ('ns=2;s="FM_1"', "FM_1"),       #e.g. Frau Menta 1 (process Unit)
@@ -45,40 +70,8 @@ ts = ('ns=2;s="Value_PDatTime"',"Value",0)
 )
 
 
-
-#In the following are Settings to create an Experiment object and settings to estimate, these are only used in the laborloop
-
-kwargs_experiment = {       #setting to create Experiment object
-
-"online_est" : dict (
-
-
-    exp_id = "current_ferm",     #identifier to read correct data from the metadata
-    meta_path = "metadata_OPCUA.ods",    #metadata location within path
-    types = {"on_CO2" : data_name},
-    index_ts = {"on_CO2" : 0},
-    read_csv_settings = {"on_CO2" : dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")},
-    to_datetime_settings = {"on_CO2" : dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce") },
-    calc_rate =("on_CO2", "BASET"),
-    read_excel_settings = dict(engine = "odf")
-
-    )
-}
-
-kwargs_estimate = {         #settings to estimate
-
-"online_est" : dict (
-    tau = 1, 
-    max_nfev = 30      #max function evaluations, maximum of iterations done in order to estimate
-    )
-
-}
-
-
-
-
-
 #Root identity: this is useful to get the values directly from the root node through root.get_child. This is used in the data collector.
+#to get the value of the structure directly through all vraiebles created above (units, variables)
 #Martins Anmerkung: überall statt 0: 2: um die Anpassung von python UA Server auf OPCUA-server von MFCS zu machen
 #Meine Anmerkung: überall steht Value+Variable nur bei BASET_2, CO2, CO2_pressure und PDatTime steht nur Value....
 

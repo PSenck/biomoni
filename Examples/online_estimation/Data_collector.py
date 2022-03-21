@@ -1,12 +1,11 @@
-from numpy import result_type
-from opcua import Client
-from settings  import Result_path, url,sample_interval, data_name, nID_HM_4 as nID
-import time
-import pandas as pd
+#Script to collect data from an OPCUA Server by using the module filemanager.py
+
+from settings  import Result_path, url, data_name, nID_HM_4 as root_ID
 import os
-import csv
 import errno
 from datetime import datetime
+from file_manager import OPCUA_collector
+
 
 
 Result_path = Result_path + "/Results" + datetime.now().strftime('_%Y-%m-%d_%H-%M-%S')      
@@ -18,58 +17,22 @@ except OSError as exc:
     pass
 
 
-client = Client(url)
-client.connect()
-print("client connected")
-
-#The Server may yield BASET_2 from Herr Menta 4, but i named the original column BASET here to match with the BASET from the model in the YEast class
-data = {"PDatTime":[],"BASET":[],"CO2":[],"CO2_pressure":[]}      #create empty df in which the values will be appended
-cols = data.keys()
-data = pd.DataFrame(data)
-
-#create csv file in which the data will be stored similar to the MFCS outcome, if you start the script again the file will be overwritten
-cols= data.keys()    #header row : column names
-first_row = ["Value"] * len(cols); second_row = ["Unit"] * len(cols)        #first row after column names  was Value (or Setpoint or Mode) in MFCS and the second row contained the Units, then there was a third empty row [] aswell
-csv_name = os.path.join(Result_path, data_name) 
-with open(csv_name, 'w', newline = "") as f:       #csv file will be created #newline because open makes some extra lines, avoid by using newline = ""
-    writer = csv.writer(f, delimiter = ";")
-    [writer.writerow(i) for i in (cols, first_row, second_row, [])]       #[] for 1 empty row
-
-    
-while True:
-    
-     #root
-    root = client.get_root_node()   #root_node
-
-    #get the value from the root_node through all the child nodes by usind the complete node id path stored in settings_mimic
-    Value_PDatTime = root.get_child(nID["PDatTime"]).get_value()
-    Value_BASET= root.get_child(nID["BASET_2"]).get_value()   #This would be the same as getting the value directly from the node id of the value node: client.get_node(values_id["BASET"][0]).get_value())
-    Value_CO2= root.get_child(nID["CO2"]).get_value()
-    CO2_pressure=root.get_child(nID["CO2_pressure"]).get_value()
-
-    appendix = pd.Series(            
-        {
-        "PDatTime" : Value_PDatTime,
-        "BASET" : Value_BASET,
-        "CO2" : Value_CO2,
-        "CO2_pressure" : CO2_pressure
-        }
-    )   ##this will be appended to the data at every while loop iteration
-    
-    appendix = pd.Series(appendix)
-
-    #append csv file row by row
-    with open(csv_name, 'a', newline = "") as f:
-        writer = csv.writer(f, delimiter = ";")
-        writer.writerow(appendix)
-
-    #just to show the data as pd.DataFrame
-    data = data.append(appendix, ignore_index=True) #append data row by row
-    print(data)
-
-    time.sleep(sample_interval)
+#csv specific settings
+cols_vs_id = {"PDatTime" : "PDatTime","BASET": "BASET_2","CO2" : "CO2", "CO2_pressure" : "CO2_pressure"}       #
+initial_row_filler = [["Value"], ["Unit"], []]      #every list in the list contains constant values to fill the rows (in this case the first 3 rows) 
+delimeter = ";"
 
 
+#azure specific settings
+#Azure Files
+conn_str = "DefaultEndpointsProtocol=https;AccountName=biomonistorage;AccountKey=xP9awCaC8m+/KmIduCH2xt5CD8iyjYZstqFPo0haOXrucxWTsMrGVwd7/WKVYaOHhCTqmIM5j/p6+CQtIXHAjg==;EndpointSuffix=core.windows.net"
+share_name = "biomoni-storage"
+azure_file_path = "Measurement-data/Experiment-data/data.csv"
+push_to_azure = True
+kwargs_push_azure_file = dict(connection_string = conn_str, share_name = share_name, azure_file_path = azure_file_path)
+
+
+OPCUA_collector(url = url, Result_path = Result_path, data_name = data_name, cols_vs_id = cols_vs_id, root_ID = root_ID, delimeter = ";", sample_interval = 180, push_to_azure = True, initial_row_filler= initial_row_filler,  print_data_in_console= True,  kwargs_push_azure_file = kwargs_push_azure_file)
 
 
 

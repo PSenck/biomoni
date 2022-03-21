@@ -1,5 +1,5 @@
-from biomoni import Experiment
-from biomoni import Model
+from biomoni.Experiment import Experiment            #from biomoni import Experiment
+from biomoni.Model import Model, CustomEstimationError                 #from biomoni import Model
 import pandas as pd
 import numpy as np
 
@@ -23,7 +23,7 @@ class Yeast(Model):     #Dependent on base class
     :class Yeast: A class to create a yeast model, the class can simulate a yeast fermentation and estimate parameters based on lab data. This class is inherited from the base class: Model.
 
     """
-
+    variables = ["cX","cS", "cE", "BASET_rate", "CO2"] #variables considered for optimization in this model. Used to access from the outside.
 
     def __repr__(self):
         """Representation of the Yeast object in the print() call"""
@@ -40,7 +40,7 @@ class Yeast(Model):     #Dependent on base class
         self.p_default = deepcopy(self.p)       #deepcopy maybe not necessary
         self.yields_default = deepcopy(self.yields)
 
-        
+        #self.variables = ["cX","cS", "cE", "BASET_rate", "CO2"] #variables considered for optimization in this model. Used to access from the outside.
 
 
     def set_params(self, p = None):
@@ -601,7 +601,9 @@ class Yeast(Model):     #Dependent on base class
              "BASET_rate": BASET_rate,
             "CO2" : CO2_percent}
             ).set_index("t")
+        
 
+        
         return sim_exp
         
 
@@ -774,7 +776,18 @@ class Yeast(Model):     #Dependent on base class
                     else:
                         pass
             res_all = np.append(res_all, res_single)        #super long vector with all residuals
+
+            
         
+        #Error Handling for too many measurement points
+        df = pd.DataFrame({'list_values': list(res_all)}) # remove nan values to count the actual data points
+        res_all_no_nan = list(df["list_values"].dropna()) # remove it fast better than looping over it
+
+        if len(res_all_no_nan) < len(self.param_vary_true_list):
+            raise CustomEstimationError("the length of the data points in the measurement data is smaller than the fit parameters with vary == True") 
+
+
+
         return res_all
 
 

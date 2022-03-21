@@ -21,8 +21,10 @@ class Experiment:
     :type exp_id: int or str
     :param meta_path: metadata file name within path.
     :type meta_path: str
-    :param types: Dict with measurement data types as keys and file location within path as value.
+    :param types: Dict with measurement data types as keys and file locations within path (or exp_dir_manual) as value.
     :type types: dict
+    :param exp_dir_manual: Manually given experiment path, can be used if the experiment data is in another directory environment than in 'param path' where the metadata is, or if the data is in the same directory but the the experiment identifier (exp_id (e.g. F1) which is also the index column in metadata) does not match with the folder name, e.g. when folder name is created automatically and thus hard to give the rigth exp_id for the Folder (eg. when the Folder is named "Exp_dateX_timeX" and is created automatically).
+    :type exp_dir_manual: str
     :param index_ts: Dict with measurement data types as keys and index of timestamp column in raw data as value.
     :type index_ts: None or dict with ints
     :param read_csv_settings: Dict with measurement data types as keys and pd.read_csv settings to read the correspondig raw data to a pd.DataFrame as value.
@@ -31,8 +33,6 @@ class Experiment:
     :type to_datetime_setings: None or dict with settings
     :param calc_rate: column in data frame of typ which should be derived to get the rate.
     :type calc_rate: tuple
-    :param exp_dir_manual: Manually given experiment name (subfolder_name within path), can be used if the experiment identifier (exp_id which is also the index column in metadata) does not match with the folder name, e.g. when folder name is created automatically.
-    :type exp_dir_manual: str
     :param endpoint: Name of endpoint column in metadata. Helpful if you have several endpoints in your metadata.
     :type endpoint: str
     :param read_excel_settings: Settings to metadata excel file.
@@ -52,6 +52,7 @@ class Experiment:
 
     def __init__(self, path, exp_id, meta_path = "metadata.xlsx"
     , types = {"off" : "offline.csv", "on": "online.CSV", "CO2" : "CO2.dat"}
+    , exp_dir_manual = None
     , index_ts = {"off" : 0, "on": 0, "CO2" : 0}
 
     , read_csv_settings = { "off" : dict(sep=";", encoding= 'unicode_escape', header = 0, usecols = None)
@@ -63,7 +64,6 @@ class Experiment:
     , "CO2" : dict(format = "%d.%m.%Y %H:%M:%S", exact= False, errors = "coerce")   }
 
     , calc_rate = ("on", "BASET")
-    , exp_dir_manual = None
     , endpoint = "end1"
     , read_excel_settings = None
 
@@ -88,7 +88,7 @@ class Experiment:
         if read_csv_settings is None:
             read_csv_settings = dict.fromkeys(types)
             for typ in types.keys():
-                read_csv_settings[typ] = dict(sep = ",")     #default setting from pandas read_csv, given here ecause it is later unkapcked with **read_csv_settings in the read_data function.
+                read_csv_settings[typ] = dict(sep = ",")     #default setting from pandas read_csv, given here because it is later unkapcked with **read_csv_settings in the read_data function. I think it would also work with dict().
         else: 
             assert read_csv_settings.keys() == types.keys(), "The given type names must match with the keys of index_ts, read_csv_settings and to_datetime_settings"
 
@@ -130,6 +130,8 @@ class Experiment:
                 self.dataset[typ] = self.read_data(path = p, index_ts = index_ts[typ], read_csv_settings = read_csv_settings[typ], to_datetime_settings = to_datetime_settings[typ])
             else:
                 warnings.warn("The file {0} could not be found within the Experiment folder: {1}".format(types[typ], dir))
+        
+        if not self.dataset: raise TypeError("No data were collected, check if measurement data is in the right directory and if it is named correctly in the 'types' argument ")
 
         metadata_all = pd.read_excel(os.path.join(path, meta_path), index_col = 0, **read_excel_settings)
         metadata_all = metadata_all.astype(object).where(metadata_all.notnull(), None)  #load metadata and replace NaN and NaT values with None required for adequate time filtering in time_filter

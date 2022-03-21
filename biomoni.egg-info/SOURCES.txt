@@ -7,6 +7,7 @@ biomoni/Model.py
 biomoni/Yeast.py
 biomoni/Yeast_variable_feedrate.py
 biomoni/__init__.py
+biomoni/file_manager.py
 biomoni/visualize.py
 biomoni.egg-info/PKG-INFO
 biomoni.egg-info/SOURCES.txt
