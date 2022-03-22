@@ -2,7 +2,7 @@
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
 from azure.storage.fileshare import ShareServiceClient, ShareClient, ShareDirectoryClient, ShareFileClient
 
-conn_str = "DefaultEndpointsProtocol=https;AccountName=biomonistorage;AccountKey=xP9awCaC8m+/KmIduCH2xt5CD8iyjYZstqFPo0haOXrucxWTsMrGVwd7/WKVYaOHhCTqmIM5j/p6+CQtIXHAjg==;EndpointSuffix=core.windows.net"
+
 service_client = ShareServiceClient.from_connection_string(conn_str= conn_str)
 share_name = "biomoni-storage"
 

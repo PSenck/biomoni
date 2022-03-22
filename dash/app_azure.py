@@ -3,7 +3,7 @@ from biomoni import Experiment, Yeast
 from biomoni import visualize
 from biomoni.file_manager import pull_azure_file
 
-
+import os
 import numpy as np
 import pandas as pd
 
@@ -19,7 +19,7 @@ import json
 
 
 #download data from Azure
-connection_string = "DefaultEndpointsProtocol=https;AccountName=biomonistorage;AccountKey=hwA0oCscA7HbTxYvkyainLR/5WrVk3lBkfsiCTJEbQCTAur5BHddOVnRxJlgt0iSxqxufqBmQUZvGCk3epXXBQ==;EndpointSuffix=core.windows.net"
+connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 share_name = "biomoni-storage"
 azure_exp_file_path = "Measurement-data/current_ferm/data.csv" 
 azure_metadata_file_path = "Measurement-data/metadata_OPCUA.ods"

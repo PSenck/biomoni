@@ -25,14 +25,14 @@ delimeter = ";"
 
 #azure specific settings
 #Azure Files
-conn_str = "DefaultEndpointsProtocol=https;AccountName=biomonistorage;AccountKey=xP9awCaC8m+/KmIduCH2xt5CD8iyjYZstqFPo0haOXrucxWTsMrGVwd7/WKVYaOHhCTqmIM5j/p6+CQtIXHAjg==;EndpointSuffix=core.windows.net"
+connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 share_name = "biomoni-storage"
-azure_file_path = "Measurement-data/Experiment-data/data.csv"
-push_to_azure = True
-kwargs_push_azure_file = dict(connection_string = conn_str, share_name = share_name, azure_file_path = azure_file_path)
+azure_exp_file_path = "Measurement-data/current_ferm/data.csv"
+kwargs_push_azure_file = dict(connection_string = connection_string, share_name = share_name, azure_file_path = azure_exp_file_path)
 
 
-OPCUA_collector(url = url, Result_path = Result_path, data_name = data_name, cols_vs_id = cols_vs_id, root_ID = root_ID, delimeter = ";", sample_interval = 180, push_to_azure = True, initial_row_filler= initial_row_filler,  print_data_in_console= True,  kwargs_push_azure_file = kwargs_push_azure_file)
+OPCUA_collector(url = url, Result_path = Result_path, data_name = data_name, cols_vs_id = cols_vs_id, root_ID = root_ID, delimeter = ";", sample_interval = 60
+, push_to_azure = True, initial_row_filler= initial_row_filler,  print_data_in_console= True,  kwargs_push_azure_file = kwargs_push_azure_file)
 
 
 

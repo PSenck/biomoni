@@ -72,9 +72,9 @@ Value_PDatTime = PDatTime.add_variable(*values_id["ts"])
 
 
 #Show the structure of the address space
-img = io.imread('MFCS_scheme.png')
-fig = px.imshow(img)
-fig.show()
+# img = io.imread('MFCS_scheme.png')
+# fig = px.imshow(img)
+# fig.show()
 
 
 try:
