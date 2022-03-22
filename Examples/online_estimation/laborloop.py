@@ -24,14 +24,14 @@ exp_dir_manual = newest_results_dir #Manually given experiment name (subfolder_n
 ##2: Pulling files from Azure file share store, either comment out 1 or 2
 ##specify paths on azure where the data is stored
 
-# conn_str = "DefaultEndpointsProtocol=https;AccountName=biomonistorage;AccountKey=hwA0oCscA7HbTxYvkyainLR/5WrVk3lBkfsiCTJEbQCTAur5BHddOVnRxJlgt0iSxqxufqBmQUZvGCk3epXXBQ==;EndpointSuffix=core.windows.net"
+# connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 # share_name = "biomoni-storage"  #file share name
 # azure_exp_file_path = "Measurement-data/current_ferm/data.csv"   #file path on azure for experiment data
 # azure_metadata_file_path = "Measurement-data/metadata_OPCUA.ods"
 
 # local_exp_file_path = azure_exp_file_path
 # local_metadata_file_path = azure_metadata_file_path
-# [pull_azure_file(connection_string= conn_str, share_name= share_name, azure_file_path= cloud, local_path= local)  for cloud, local in zip([azure_exp_file_path, azure_metadata_file_path], [local_exp_file_path, local_metadata_file_path]) ]
+# [pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= cloud, local_path= local)  for cloud, local in zip([azure_exp_file_path, azure_metadata_file_path], [local_exp_file_path, local_metadata_file_path]) ]
 # path = os.path.dirname(local_metadata_file_path)
 # exp_dir_manual = os.path.dirname(local_exp_file_path)
 
@@ -129,6 +129,7 @@ except TypeError as TE:
 
 while True:
     time.sleep(1)    # Sampling before each estimation
+    # pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= azure_exp_file_path, local_path= local_exp_file_path)
 
     Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
 
