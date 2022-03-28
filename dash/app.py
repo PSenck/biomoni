@@ -393,10 +393,10 @@ def create_data(n_intervals, hours, n_clicks, parest_mode, data, columns):
 
 
 if __name__ == "__main__":
-    app.run_server(host='localhost' , port="7779",  dev_tools_hot_reload=False, debug = True)     #debug=True, host='localhost' , host="0.0.0.0"
+    app.run_server(host='localhost' , port="7779",  dev_tools_hot_reload=False, debug = True)     ##für windows: debug=False, host='localhost' , host="0.0.0.0" 
 
 # visit http://localhost:7777/ in your web browser.
 
 
-#sqlite3.DatabaseError: database disk image is malformed
+#sqlite3.DatabaseError: database disk image is malformed error on windows because of datastore
 

@@ -784,7 +784,7 @@ class Yeast(Model):     #Dependent on base class
         res_all_no_nan = list(df["list_values"].dropna()) # remove it fast better than looping over it
 
         if len(res_all_no_nan) < len(self.param_vary_true_list):
-            raise CustomEstimationError("the length of the data points in the measurement data is smaller than the fit parameters with vary == True") 
+            raise CustomEstimationError("The length of the data points in the measurement data is smaller than the number of the fit parameters with vary == True") 
 
 
 

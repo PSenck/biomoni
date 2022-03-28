@@ -323,5 +323,5 @@ class Model:
 
 
 class CustomEstimationError(TypeError):
-    "This Error is is raised if the length of the data points in the measurement data is smaller than the fit parameters (vary == True)"
+    "This Error is is raised if the length of the data points in the measurement data is smaller than the number of the fit parameters (vary == True)"
     pass

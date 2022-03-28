@@ -787,6 +787,13 @@ class Yeast_vf(Model):     #Dependent on base class
                     else:
                         pass
             res_all = np.append(res_all, res_single)        #super long vector with all residuals
+
+        #Error Handling for too many measurement points
+        df = pd.DataFrame({'list_values': list(res_all)}) # remove nan values to count the actual data points
+        res_all_no_nan = list(df["list_values"].dropna()) # remove it fast better than looping over it
+
+        if len(res_all_no_nan) < len(self.param_vary_true_list):
+            raise CustomEstimationError("The length of the data points in the measurement data is smaller than the number of the fit parameters with vary == True") 
         
         return res_all
 

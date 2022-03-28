@@ -190,6 +190,7 @@ class Experiment:
             elif end is not None: 
                 df = df[(df["ts"] >= start ) &  (df["ts"] <= end)] 
 
+        assert not df.empty, "The Dataframe is empty"
         self.dataset[dskey] = df
 
 
@@ -258,6 +259,7 @@ path
 
         df = pd.read_csv(path, **read_csv_settings)
         df["ts"] = pd.to_datetime(df.iloc[:, index_ts], **to_datetime_settings)
+        assert not df.empty, "The Dataframe is empty"
         return df
 
 

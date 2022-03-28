@@ -434,10 +434,7 @@ def create_data(n_intervals, hours, n_clicks, n_clicks_error, parest_mode, data,
 
 
 if __name__ == "__main__":
-    dash_app.run_server(debug = True, host='0.0.0.0', port='8000')     #debug=True, host='localhost' , host="0.0.0.0"
-
-# visit http://localhost:7777/ in your web browser.
+    dash_app.run_server(debug = True, host='0.0.0.0', port='8000')     #für windows: debug=False, host='localhost' , host="0.0.0.0" 
 
 
-#sqlite3.DatabaseError: database disk image is malformed
 
