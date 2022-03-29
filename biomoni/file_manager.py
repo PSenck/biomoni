@@ -225,6 +225,7 @@ def push_azure_file(data, connection_string, share_name, azure_file_path):
     #     print(ex) 
 
 
+import time
 
 def pull_azure_file(connection_string, share_name, azure_file_path, local_path = None):
     """Function to download files from azure and save them in a local directory.
@@ -241,10 +242,10 @@ def pull_azure_file(connection_string, share_name, azure_file_path, local_path =
 
 
     try:
-        list(share_client.list_directories_and_files(os.path.dirname(azure_file_path)))    #check if there is even a directory like that on azure
+        share_client.get_share_properties()
         
-    except:
-        sys.exit("The directory of the file does not exist on azure, the upload was stopped") 
+    except Exception as ex:
+        raise ex
         
 
     if local_path is None:
@@ -274,11 +275,12 @@ def pull_azure_file(connection_string, share_name, azure_file_path, local_path =
             data.write(stream.readall())
 
     except ResourceExistsError as ex:
-        print("ResourceExistsError:", ex.message)
+        raise ex
+        #print("ResourceExistsError:", ex.message)
 
     except ResourceNotFoundError as ex:
-        #print("ResourceNotFoundError:", ex.message)
-        sys.exit("The file {0} was not found in the directory {1} on azure, downlaod was stopped".format(os.path.basename(azure_file_path) , os.path.dirname(azure_file_path))) 
+        raise ex
+        #sys.exit("The file {0} was not found in the directory {1} on azure, downlaod was stopped".format(os.path.basename(azure_file_path) , os.path.dirname(azure_file_path))) 
 
 
     # except Exception as ex:

@@ -9,6 +9,7 @@ def visualize(data_1, data_2 = None, title = None
 , column_dict = {"BASET_rate" : "cyan", "cX" : "red", "cS" : "green", "cE" : "blue", "CO2" : "orange"}
 , suffix_1 = "", suffix_2 = "_fitted", mode_1 = "markers", mode_2 = "lines"
 , secondary_y_cols = ["CO2", "BASET_rate"], yaxis_type = "linear", sec_yaxis_type = "linear"
+, **layout_kwargs
 ): 
     """ Function to visualize experimental data and simulated data of one experiment either alone or in conjunction. It is necessary that the experimental data and the simulated data are from the same experiment to yield meaningful results. 
     The given data must be either a single pd.DataFrame: df or a list or a dict with pd.DataFrame objects, for example a dict with "off" : df1, "on" : df2 and "CO2" : df3. 
@@ -95,9 +96,7 @@ def visualize(data_1, data_2 = None, title = None
     fig.update_yaxes(title_text= str(cols_y2), secondary_y=True, title_standoff = 20, type = sec_yaxis_type)
 
     fig.update_xaxes(title_text = "Time [h]")
-    fig.update_layout(title_text = title , title_x=0.5)
-    fig.update_layout(legend=dict(x = 1))
-    #fig.show()
+    fig.update_layout(title_text = title, **layout_kwargs)  #title_x = 0.5, legend=dict(x = 1)
 
     return fig
 
