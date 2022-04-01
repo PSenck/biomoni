@@ -5,6 +5,18 @@ from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 
 
+full_names = dict(
+
+    BASET_rate = "Base_rate [mL/h]",
+    cX = "cX [g/L]",
+    cE = "cE [g/L]",
+    cS = "cS [g/L]",
+    CO2 = "CO2 [vol. %]"
+)
+
+    
+
+
 def visualize(data_1, data_2 = None, title = None
 , column_dict = {"BASET_rate" : "cyan", "cX" : "red", "cS" : "green", "cE" : "blue", "CO2" : "orange"}
 , suffix_1 = "", suffix_2 = "_fitted", mode_1 = "markers", mode_2 = "lines"
@@ -90,10 +102,14 @@ def visualize(data_1, data_2 = None, title = None
                         )
     
     available_columns = set(available_columns)
-    cols_y1 = [col for col in available_columns if col not in secondary_y_cols]            
-    cols_y2 = [col for col in available_columns if col in secondary_y_cols]
-    fig.update_yaxes(title_text= str(cols_y1), secondary_y=False , title_standoff = 20 , type = yaxis_type)
-    fig.update_yaxes(title_text= str(cols_y2), secondary_y=True, title_standoff = 20, type = sec_yaxis_type)
+    cols_y1 = (col for col in available_columns if col not in secondary_y_cols)   
+    cols_y1 = (full_names[col] if col in full_names.keys() else col for col in cols_y1) 
+
+    cols_y2 = (col for col in available_columns if col in secondary_y_cols)
+    cols_y2 = (full_names[col] if col in full_names.keys() else col for col in cols_y2) 
+
+    fig.update_yaxes(title_text= ", ".join(cols_y1), secondary_y=False , title_standoff = 20 , type = yaxis_type)
+    fig.update_yaxes(title_text= ", ".join(cols_y2), secondary_y=True, title_standoff = 20, type = sec_yaxis_type)
 
     fig.update_xaxes(title_text = "Time [h]")
     fig.update_layout(title_text = title, **layout_kwargs)  #title_x = 0.5, legend=dict(x = 1)

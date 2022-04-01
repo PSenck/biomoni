@@ -7,6 +7,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
+import os
 import dash
 from dash import dcc
 from dash import html
@@ -26,7 +27,7 @@ import json
 
 #Getting the path
 Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"        #path in settings.py?
-Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
+#Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" 
 
 
 
@@ -49,7 +50,9 @@ experiment_options = kwargs_experiment["typ1"]       #use ur options to create a
 estimation_options = kwargs_estimate["typ1"]         #use ur options to estimate
 
 #Using on, off, CO2 data from F7
-path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten"
+path = os.path.dirname(path)
+
+
 experiment_options = kwargs_experiment["typ2"]
 estimation_options = kwargs_estimate["typ2"]
 
@@ -68,6 +71,7 @@ colors = {
     "table_header" : "red",
     "table_background" : "grey"
 }
+param_names = Yeast.p_full_names
 
 #external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]   #external stylesheets to style your layout
 #cache = diskcache.Cache("./cache") #options for long_callback with cache
@@ -393,10 +397,12 @@ def create_data(n_intervals, hours, n_clicks, parest_mode, data, columns):
 
 
 if __name__ == "__main__":
-    app.run_server(host='localhost' , port="7779",  dev_tools_hot_reload=False, debug = True)     ##für windows: debug=False, host='localhost' , host="0.0.0.0" 
+    app.run_server(host='localhost' , port="7779",  dev_tools_hot_reload=False, debug = False)     ##für windows: debug=False, host='localhost' , host="0.0.0.0" 
 
 # visit http://localhost:7777/ in your web browser.
 
 
 #sqlite3.DatabaseError: database disk image is malformed error on windows because of datastore
 
+
+#Important: If you run this app on Windows, you must specify host='localhost' nd debug = False in the app.run_server() statement at he bottom of this code.

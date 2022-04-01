@@ -24,6 +24,27 @@ class Yeast(Model):     #Dependent on base class
 
     """
     variables = ["cX","cS", "cE", "BASET_rate", "CO2"] #variables considered for optimization in this model. Used to access from the outside.
+    p_full_names = dict(
+
+        qsmax = "qsmax, Maximum glucose uptake rate [g/(g*h)]",
+        qemax = "qemax, Maximum ethanol uptake rate [g/(g*h)]",
+        base_coef = "base_coef, base coefficient [mol/g]",
+        qO2max = "qO2max, Maximum oxygen uptake rate [g/(g*h)]",
+        qm_max = "qm_max, glucose uptake rate required for maintenance [g/(g*h)]",
+        Ks = "Ks, Saturation constant, concentration of glucose at µ = 0.5 µmax [g/L]",
+        Ke = "Ke, Saturation constant, concentration of ethanol at µ = 0.5 µmax [g/L]",
+        Ki = "Ki, Inhibition constant, glucose inhibits uptake of ethanol [g/L]",
+        Yxs_ox = "Yxs_ox, Yield biomass per glucose (oxidative growth) [g/g]",
+        Yxs_red = "Yxs_red, Yield biomass per glucose (reductive growth) [g/g]",
+        Yxe_et = "Yxe_et, Yield biomass per ethanol [g/g]",
+        Yxg_glyc = "Yxg_glyc, Yield biomass per glycerol [g/g]",
+        HX = "HX, Stoichiometric hydrogen content of biomass [mol/mol]",
+        OX = "OX, Stoichiometric oxygen content of biomass [mol/mol]",
+        NX = "NX, Stoichiometric nitrogen content of biomass [mol/mol]",
+        g_e = "g_e, determined experimentally: formation glycerol per ethanol [g/g]" 
+
+    )
+
 
     def __repr__(self):
         """Representation of the Yeast object in the print() call"""
@@ -40,7 +61,7 @@ class Yeast(Model):     #Dependent on base class
         self.p_default = deepcopy(self.p)       #deepcopy maybe not necessary
         self.yields_default = deepcopy(self.yields)
 
-        #self.variables = ["cX","cS", "cE", "BASET_rate", "CO2"] #variables considered for optimization in this model. Used to access from the outside.
+        
 
 
     def set_params(self, p = None):
@@ -66,7 +87,7 @@ class Yeast(Model):     #Dependent on base class
             p.add("Ke", value=0.1, min=0.01, max=1, vary=False)    #Saturation constant, concentration of ethanol at µ = 0.5 µmax [g/L]
             p.add("Ki", value=0.1, min=0.01, max=1, vary=False)    #Inhibition constant, glucose inhibits uptake of ethanol [g/L]
 
-            p.add("Yxs_ox", value= 0.5389, min=0.3, max=0.6, vary=True) #Yield biomass per glucose (oxidative growth) [g/g] #previous start val: 49    #estimated value 0.52792125
+            p.add("Yxs_ox", value= 0.5389, min=0.3, max=0.6, vary=True)    #Yield biomass per glucose (oxidative growth) [g/g] #previous start val: 49    #estimated value 0.52792125
             p.add("Yxs_red", value=0.05, min=0.01, max=0.8, vary=False)    #Yield biomass per glucose (reductive growth) [g/g] 
             p.add("Yxe_et", value=0.72, min=0.5, max=0.8, vary=False)      #Yield biomass per ethanol [g/g]
             p.add("Yxg_glyc", value=0.2, min=0.1, max=0.35, vary=False)    #Yield biomass per glycerol [g/g]              #value=0.2, min=0.1, max=0.35, vary=False

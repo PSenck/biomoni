@@ -27,7 +27,27 @@ class Yeast_vf(Model):     #Dependent on base class
     The values of the changing feedrate where derived from the feed pump power in the MFCS data.
 
     """
+    variables = ["cX","cS", "cE", "BASET_rate", "CO2"] #variables considered for optimization in this model. Used to access from the outside.
+    p_full_names = dict(
 
+        qsmax = "qsmax, Maximum glucose uptake rate [g/(g*h)]",
+        qemax = "qemax, Maximum ethanol uptake rate [g/(g*h)]",
+        base_coef = "base_coef, base coefficient [mol/g]",
+        qO2max = "qO2max, Maximum oxygen uptake rate [g/(g*h)]",
+        qm_max = "qm_max, glucose uptake rate required for maintenance [g/(g*h)]",
+        Ks = "Ks, Saturation constant, concentration of glucose at µ = 0.5 µmax [g/L]",
+        Ke = "Ke, Saturation constant, concentration of ethanol at µ = 0.5 µmax [g/L]",
+        Ki = "Ki, Inhibition constant, glucose inhibits uptake of ethanol [g/L]",
+        Yxs_ox = "Yxs_ox, Yield biomass per glucose (oxidative growth) [g/g]",
+        Yxs_red = "Yxs_red, Yield biomass per glucose (reductive growth) [g/g]",
+        Yxe_et = "Yxe_et, Yield biomass per ethanol [g/g]",
+        Yxg_glyc = "Yxg_glyc, Yield biomass per glycerol [g/g]",
+        HX = "HX, Stoichiometric hydrogen content of biomass [mol/mol]",
+        OX = "OX, Stoichiometric oxygen content of biomass [mol/mol]",
+        NX = "NX, Stoichiometric nitrogen content of biomass [mol/mol]",
+        g_e = "g_e, determined experimentally: formation glycerol per ethanol [g/g]" 
+
+    )
 
     def __repr__(self):
         """Representation of the Yeast object in the print() call"""
