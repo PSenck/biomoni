@@ -9,12 +9,12 @@ import pandas as pd
 import os
 import csv
 import errno
-
+from datetime import datetime
 import sys
 
 
 def OPCUA_collector(url, Result_path, data_name, cols_vs_id, root_ID, delimeter = ","
-    , initial_row_filler = None, sample_interval = 60, print_data_in_console = False
+    , initial_row_filler = None, sample_interval = 60, create_ts = False, ts_format = "%d.%m.%Y  %H:%M:%S", print_data_in_console = False
     , push_to_azure = False, kwargs_push_azure_file = None):
     """Function to collect values from OPCUA Server over the root ID and write them into a csv file.
 
@@ -31,6 +31,8 @@ def OPCUA_collector(url, Result_path, data_name, cols_vs_id, root_ID, delimeter 
         delimeter (str): separator to split columns.
         initial_row_filler (list of lists): will fill the first rows of the csv file (after the column names).
         sample_interval (int): sample interval in seconds.
+        create_ts (bool): Create timestamp everytime OPCUA_collector is sampling (within evry loop iteration). Nevertheless it would be more acurate to use the timestamps given from the OPCUA Server directly (like PDatTime) instead of create on here.
+        ts_format (str): Disired Time Format if create_ts is True.
         print_data_in_console (bool): show the sampled data as appending pd.DataFrame in the console (only for control pruposes).
         push_to_azure (bool): push the csv file directly to azure.
         kwargs_push_azure_file (dict): Keyword arguments for the function push_azure_file.
@@ -38,8 +40,12 @@ def OPCUA_collector(url, Result_path, data_name, cols_vs_id, root_ID, delimeter 
     """
     
 
-    #The Server may yield BASET_2 from Herr Menta 4, but i named the original column BASET here to match with the BASET from the model in the Yeast class
+    
     cols = list(cols_vs_id.keys())
+
+    if create_ts == True:
+        cols.insert(0, "ts")
+
     data = {col : [] for col in cols}
     data = pd.DataFrame(data)
 
@@ -62,7 +68,13 @@ def OPCUA_collector(url, Result_path, data_name, cols_vs_id, root_ID, delimeter 
         
     while True:
         
-        Values_dict = {name : root.get_child(root_ID[id]).get_value() for name, id in cols_vs_id.items()}
+        Values_dict = {}
+        if create_ts == True:
+            Values_dict["ts"] = datetime.now().strftime(ts_format) 
+
+        for name, id in cols_vs_id.items():
+            Values_dict[name] = root.get_child(root_ID[id]).get_value()
+
         appendix = pd.Series(Values_dict)
 
         assert list(appendix.index) == cols, "The cols in the CSV file and the cols in the appendix much match in the same row"

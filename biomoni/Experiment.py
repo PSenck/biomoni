@@ -71,7 +71,7 @@ class Experiment:
        
 
     # , filtering_columns = False, filter_on = ["base_rate"], filter_off = ["cX", "cS", "cE"], filter_CO2 = ["CO2"]
-        pd.options.mode.chained_assignment = None       #because of pandas anoying error
+        pd.options.mode.chained_assignment = None       #because of pandas anoying warning message
         
         assert type(path) is str, "The given Path must be of type str"
         assert type(meta_path) is str, "The given meta_path must be of type str"
@@ -88,20 +88,20 @@ class Experiment:
         if read_csv_settings is None:
             read_csv_settings = dict.fromkeys(types)
             for typ in types.keys():
-                read_csv_settings[typ] = dict(sep = ",")     #default setting from pandas read_csv, given here because it is later unkapcked with **read_csv_settings in the read_data function. I think it would also work with dict().
+                read_csv_settings[typ] = {} #if no read csv setting are given **{} will result into nothin additional lateron in read
         else: 
             assert read_csv_settings.keys() == types.keys(), "The given type names must match with the keys of index_ts, read_csv_settings and to_datetime_settings"
 
         if to_datetime_settings is None:
             to_datetime_settings = dict.fromkeys(types)
             for typ in types.keys():
-                to_datetime_settings[typ] = dict(errors="raise")    #standard panas.to_dattime seeting
+                to_datetime_settings[typ] = {}  #if no datetim settings are given **{} 
         else: 
             assert to_datetime_settings.keys() == types.keys(), "The given type names must match with the keys of index_ts, read_csv_settings and to_datetime_settings"
 
         
         if read_excel_settings is None:
-            read_excel_settings = dict(header = 0) #standard read_excel settings
+            read_excel_settings = {}
 
 
         self.path = path 
@@ -112,7 +112,7 @@ class Experiment:
 
         if exp_dir_manual is None:
             dir = os.path.join(path, exp_id)    #if no manual experiment name(exp_dir_manual - folder name) is given, the exp_id is assumed to be named as the subfolder within path.
-            assert os.path.isdir(dir), "The directory {0} does not exist. If the experiment folder has another name as the identifier exp_id, consider to use exp_dir_manual as subfolder path name.".format(dir)
+            assert os.path.isdir(dir), "The directory {0} does not exist. If the experiment folder has another name as the identifier exp_id or if the experiment folder is not within path at all, consider to use exp_dir_manual as path name for the experiment data.".format(dir)
         else:
             dir = exp_dir_manual
             assert os.path.isdir(dir), "The directory {0} does not exist.".format(dir)
@@ -126,7 +126,7 @@ class Experiment:
 
         self.dataset = {}
         for typ, p in file_path.items():
-            if os.path.isfile(p):   #checking if the file in the experiment folder even exists              #Gefährlich try except
+            if os.path.isfile(p):   #checking if the file in the experiment folder even exists           
                 self.dataset[typ] = self.read_data(path = p, index_ts = index_ts[typ], read_csv_settings = read_csv_settings[typ], to_datetime_settings = to_datetime_settings[typ])
             else:
                 warnings.warn("The file {0} could not be found within the Experiment folder: {1}".format(types[typ], dir))

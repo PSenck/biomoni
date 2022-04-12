@@ -4,7 +4,7 @@ from settings  import Result_path, url, data_name, nID_HM_4 as root_ID
 import os
 import errno
 from datetime import datetime
-from file_manager import OPCUA_collector
+from biomoni.file_manager import OPCUA_collector
 
 
 
@@ -32,7 +32,8 @@ kwargs_push_azure_file = dict(connection_string = connection_string, share_name 
 
 
 OPCUA_collector(url = url, Result_path = Result_path, data_name = data_name, cols_vs_id = cols_vs_id, root_ID = root_ID, delimeter = ";", sample_interval = 60
-, push_to_azure = True, initial_row_filler= initial_row_filler,  print_data_in_console= True,  kwargs_push_azure_file = kwargs_push_azure_file)
+,  create_ts = True, ts_format = "%d.%m.%Y  %H:%M:%S"
+, push_to_azure = False, initial_row_filler= initial_row_filler,  print_data_in_console= True,  kwargs_push_azure_file = kwargs_push_azure_file)
 
 
 

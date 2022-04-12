@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 set_connstr.sh
 test/
+ignore/
+images/
+Measurement-data/

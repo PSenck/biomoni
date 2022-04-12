@@ -75,26 +75,35 @@ except TypeError as TE:
     print(TE.message)
 
 
-###Nur zum Abfangen für das Problem mit zu wneig Datenpunkten####
-##############################################################
-# i = 0
-# while i == 0:
-#     try:
-#         Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
-#         y.set_params(p1)    #change initial parameters to test estimation
-#         y.estimate(Exp, tau = 1, max_nfev = 2)     #max function evaluations #, max_nfev = 100
-#         i = 1
-#         print("The Estimation loop begins")
+##check if there are enough datapoints####
+#############################################################
+
+#first variant: just catch th errors that would occur if there are not enough data points
+i = 0
+while i == 0:
+    try:
+        Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
+        y.set_params(p1)    #change initial parameters to test estimation
+        y.estimate(Exp, tau = 1, max_nfev = 2)     #max function evaluations #, max_nfev = 100
+        i = 1
+        print("The Estimation loop begins")
         
-#     except CustomEstimationError:
-#         print("Not enough data points sampled")
-#         time.sleep(10)
-#     except IndexError:
-#         print("Not enough data points sampled")
-#         time.sleep(10)
+    except CustomEstimationError:           #possible Errors that occur if not enough data points are sampled
+        print("Not enough data points sampled")
+        time.sleep(10)
+    except IndexError:
+        print("Not enough data points sampled")
+        time.sleep(10)
+    except AssertionError:
+        print("Not enough data points sampled") 
+        time.sleep(10)
+    except ValueError:
+        print("Not enough data points sampled") 
+        time.sleep(10)
 
     
 
+##second variant, check if ther as many data points as parameters on true
 # y = Yeast()
 # y.set_params(p1)
 

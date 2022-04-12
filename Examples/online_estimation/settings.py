@@ -4,9 +4,10 @@
 Simulation_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten" #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Simulation_path
 Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
 
-##Windows 
-#Simulation_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Simulation_path
-#Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"    #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
+#Windows 
+Simulation_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Simulation_path
+Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"    #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
+
 
 
 exp_id = "F7"   #The Experiment to simulate, within Simulation_path
