@@ -68,70 +68,65 @@ with open(param_file, 'w', newline = "") as f:       #csv file will be created #
 
 figure_list = []
 
-try:
-    Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
-except TypeError as TE:
-
-    print(TE.message)
 
 
 ##check if there are enough datapoints####
 #############################################################
 
-#first variant: just catch th errors that would occur if there are not enough data points
-i = 0
-while i == 0:
-    try:
-        Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
-        y.set_params(p1)    #change initial parameters to test estimation
-        y.estimate(Exp, tau = 1, max_nfev = 2)     #max function evaluations #, max_nfev = 100
-        i = 1
-        print("The Estimation loop begins")
+# #first variant: just catch th errors that would occur if there are not enough data points
+# i = 0
+# while i == 0:
+#     try:
+#         Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
+#         y.set_params(p1)    #change initial parameters to test estimation
+#         y.estimate(Exp, tau = 1, max_nfev = 2)     #max function evaluations #, max_nfev = 100
+#         i = 1
+#         print("The Estimation loop begins")
         
-    except CustomEstimationError:           #possible Errors that occur if not enough data points are sampled
-        print("Not enough data points sampled")
-        time.sleep(10)
-    except IndexError:
-        print("Not enough data points sampled")
-        time.sleep(10)
-    except AssertionError:
-        print("Not enough data points sampled") 
-        time.sleep(10)
-    except ValueError:
-        print("Not enough data points sampled") 
-        time.sleep(10)
+#     except CustomEstimationError:           #possible Errors that occur if not enough data points are sampled
+#         print("Not enough data points sampled")
+#         time.sleep(10)
+#     except IndexError:
+#         print("Not enough data points sampled")
+#         time.sleep(10)
+#     except AssertionError:
+#         print("Not enough data points sampled") 
+#         time.sleep(10)
+#     except ValueError:
+#         print("Not enough data points sampled") 
+#         time.sleep(10)
 
     
 
 ##second variant, check if ther as many data points as parameters on true
-# y = Yeast()
-# y.set_params(p1)
+y = Yeast()
+y.set_params(p1)
 
-# variables = y.variables
-# p = y.p
+variables = y.variables
+p = y.p
 
-# param_vary_true_list = []       #generate a list with all parameters that are set as fit parameters (vary = True), this is done to compare the length of it with the numbe rof measurement points. If the number of measurement points is less than the number of fit parameters, the optimization wont work and should raise an Error (CustomEstimationError).
-# for i in list(p):
-#     if p[i].vary == True:
-#         param_vary_true_list.append(i)
-# param_vary_true_list = param_vary_true_list
+param_vary_true_list = []       #generate a list with all parameters that are set as fit parameters (vary = True), this is done to compare the length of it with the numbe rof measurement points. If the number of measurement points is less than the number of fit parameters, the optimization wont work and should raise an Error (CustomEstimationError).
+for i in list(p):
+    if p[i].vary == True:
+        param_vary_true_list.append(i)
+param_vary_true_list = param_vary_true_list
 
-# i = 0
-# while i == 0:
-#     Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
-#     length_data_points = 0
-#     for df in Exp.dataset.values():
-#         for col in df:
-#             if col in variables:
-#                 cols_no_nan = df[col].dropna()
-#                 length_data_points += len(cols_no_nan)
+i = 0
+while i == 0:
+    Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
+    length_data_points = 0
+    for df in Exp.dataset.values():
+        for col in df:
+            if col in variables:
+                cols_no_nan = df[col].dropna()
+                length_data_points += len(cols_no_nan)
     
-#     if length_data_points < len(param_vary_true_list):
-#         print("Not enough data points sampled")
-#         time.sleep(10)
-#     else: 
-#         print("The Estimation loop begins")
-#         i = 1
+    if length_data_points < len(param_vary_true_list):
+        print("Not enough data points sampled")
+        time.sleep(10)
+    else: 
+        print("The Estimation loop begins")
+        i = 1
     
 
 ################################################################

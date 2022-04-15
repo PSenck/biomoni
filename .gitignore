@@ -3,5 +3,4 @@ __pycache__/
 set_connstr.sh
 test/
 ignore/
-images/
 Measurement-data/

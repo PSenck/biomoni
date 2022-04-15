@@ -16,7 +16,6 @@ import time
 from datetime import datetime
 from param_collection import p0
 import plotly.express as px
-from skimage import io
 
 
 
@@ -70,11 +69,6 @@ Value_CO2 = CO2.add_variable(*values_id["CO2"])
 Value_CO2_p = CO2_p.add_variable(*values_id["CO2_pressure"])
 Value_PDatTime = PDatTime.add_variable(*values_id["ts"])
 
-
-#Show the structure of the address space
-# img = io.imread('MFCS_scheme.png')
-# fig = px.imshow(img)
-# fig.show()
 
 
 try:
