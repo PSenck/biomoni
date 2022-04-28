@@ -11,20 +11,28 @@ from biomoni.Model import CustomEstimationError
 from biomoni.visualize import visualize
 from settings import Result_path, kwargs_experiment, data_name
 from param_collection import p1
-from file_manager import pull_azure_file
+from biomoni.file_manager import pull_azure_file
 
-# #1: Getting files from the automatically generated local file store, either comment out 1 or 2
+###either comment out 1 or 2: 1 is getting files from the local directory (which was created automatically from Data_collector)
+
+#########1111111################################
+# #1: Getting files from the automatically generated local file store
 
 sub_paths = next(os.walk(Result_path))[1]       #yields the subsirectory in the given path
 newest_results_dir = max([os.path.join(Result_path,i) for i in sub_paths], key=os.path.getmtime) #gives newest subdirectory
 path = Result_path
 exp_dir_manual = newest_results_dir #Manually given experiment name (subfolder_name within path), can be used if the experiment identifier (exp_id which is also the index column in metadata) does not match with the folder name, e.g. when folder name is created automatically.
+#########1111111################################
 
 
-##2: Pulling files from Azure file share store, either comment out 1 or 2
+#########22222222#######################
+##2: Pulling files from Azure file share store (which was creted automatically from Data_collector if push_to_azure == True)
 ##specify paths on azure where the data is stored
 
-# connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+# #To create a Environmental variable that contains the connection string do the following: Linux/macOS: export STORAGE_CONNECTION_STRING="<yourconnectionstring>"
+# #Windows: setx STORAGE_CONNECTION_STRING "<yourconnectionstring>"
+
+# connection_string = os.getenv("STORAGE_CONNECTION_STRING")  #the connection 
 # share_name = "biomoni-storage"  #file share name
 # azure_exp_file_path = "Measurement-data/current_ferm/data.csv"   #file path on azure for experiment data
 # azure_metadata_file_path = "Measurement-data/metadata_OPCUA.ods"
@@ -34,7 +42,7 @@ exp_dir_manual = newest_results_dir #Manually given experiment name (subfolder_n
 # [pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= cloud, local_path= local)  for cloud, local in zip([azure_exp_file_path, azure_metadata_file_path], [local_exp_file_path, local_metadata_file_path]) ]
 # path = os.path.dirname(local_metadata_file_path)
 # exp_dir_manual = os.path.dirname(local_exp_file_path)
-
+#########22222222#######################
 
 
 #The Laborloop routine starts here
@@ -71,34 +79,6 @@ figure_list = []
 
 
 ##check if there are enough datapoints####
-#############################################################
-
-# #first variant: just catch th errors that would occur if there are not enough data points
-# i = 0
-# while i == 0:
-#     try:
-#         Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
-#         y.set_params(p1)    #change initial parameters to test estimation
-#         y.estimate(Exp, tau = 1, max_nfev = 2)     #max function evaluations #, max_nfev = 100
-#         i = 1
-#         print("The Estimation loop begins")
-        
-#     except CustomEstimationError:           #possible Errors that occur if not enough data points are sampled
-#         print("Not enough data points sampled")
-#         time.sleep(10)
-#     except IndexError:
-#         print("Not enough data points sampled")
-#         time.sleep(10)
-#     except AssertionError:
-#         print("Not enough data points sampled") 
-#         time.sleep(10)
-#     except ValueError:
-#         print("Not enough data points sampled") 
-#         time.sleep(10)
-
-    
-
-##second variant, check if ther as many data points as parameters on true
 y = Yeast()
 y.set_params(p1)
 
@@ -113,7 +93,14 @@ param_vary_true_list = param_vary_true_list
 
 i = 0
 while i == 0:
-    Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
+    
+    try:
+        Exp = Experiment(path = path, exp_dir_manual = exp_dir_manual, **kwargs_experiment["online_est"])
+    except AssertionError:
+        print("no data sampled")
+        time.sleep(10)
+        continue
+
     length_data_points = 0
     for df in Exp.dataset.values():
         for col in df:

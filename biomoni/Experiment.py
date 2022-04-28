@@ -21,22 +21,26 @@ class Experiment:
     :type exp_id: int or str
     :param meta_path: metadata file name within path.
     :type meta_path: str
-    :param types: Dict with measurement data types as keys and file locations within path (or exp_dir_manual) as value.
+    :param types: Dict with measurement data types (desired names in Experiment object) as keys and file locations within path/exp_id (or exp_dir_manual) as value, e.g. {'CO2' : 'CO2_file.csv'}.
     :type types: dict
-    :param exp_dir_manual: Manually given experiment path, can be used if the experiment data is in another directory environment than in 'param path' where the metadata is, or if the data is in the same directory but the the experiment identifier (exp_id (e.g. F1) which is also the index column in metadata) does not match with the folder name, e.g. when folder name is created automatically and thus hard to give the rigth exp_id for the Folder (eg. when the Folder is named "Exp_dateX_timeX" and is created automatically).
-    :type exp_dir_manual: str
+    :param exp_dir_manual: Manually given experiment path, can be used if the experiment data is in another directory than in the 'path' location where the metadata is, or if the data is in the same directory but the the experiment identifier (exp_id (e.g. F1) which is also the index column in metadata) does not match with the folder name, e.g. when folder name is created automatically and thus it`s hard to give the right exp_id for the Folder (eg. when the Folder is named "Exp_dateX_timeX" and is created automatically).
+    :type exp_dir_manual: None or str
     :param index_ts: Dict with measurement data types as keys and index of timestamp column in raw data as value.
     :type index_ts: None or dict with ints
     :param read_csv_settings: Dict with measurement data types as keys and pd.read_csv settings to read the correspondig raw data to a pd.DataFrame as value.
     :type read_csv_settings: None or dict with settings
-    :param to_datetime_settings: Dict with measurement data types as keys and settings to convert timestamp column in raw data to pd.Timestamp as value.
+    :param to_datetime_settings: Dict with measurement data types as keys and settings to convert the timestamp column in raw data from string to pd.Timestamp as value.
     :type to_datetime_setings: None or dict with settings
-    :param calc_rate: column in data frame of typ which should be derived to get the rate.
-    :type calc_rate: tuple
+    :param calc_rate: The first derivative is formed of the column 'X' in the dataframe of 'type'. E.g. {E.g 'on' : 'BASET'} calculates the 1. derivative of BASET (BASET_rate) in the 'on' data type.
+    :type calc_rate: None or dict
     :param endpoint: Name of endpoint column in metadata. Helpful if you have several endpoints in your metadata.
     :type endpoint: str
     :param read_excel_settings: Settings to metadata excel file.
-    :type read_excel_settings: None or dict.
+    :type read_excel_settings: None dict.
+    :param smooth: dict with keys corresponding the measuring types (e.g. "on" , "CO2") and value corresponding to the columns to be smoothed e.g. [BASET, ACID].
+    :type smooth: dict
+    :param kwargs_smooth: kwargs to be used to smooth in 'pandas.DataFrame.ewm'
+    :type kwargs_smooth: dict
 
 
     :return: Experiment object contaning the measurement data.
@@ -50,22 +54,16 @@ class Experiment:
 
     #format_ts kommt raus wenn du eh to_datetime_settings_gibst
 
-    def __init__(self, path, exp_id, meta_path = "metadata.xlsx"
-    , types = {"off" : "offline.csv", "on": "online.CSV", "CO2" : "CO2.dat"}
+    def __init__(self, path, exp_id, meta_path, types
     , exp_dir_manual = None
-    , index_ts = {"off" : 0, "on": 0, "CO2" : 0}
-
-    , read_csv_settings = { "off" : dict(sep=";", encoding= 'unicode_escape', header = 0, usecols = None)
-    , "on": dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")
-    , "CO2" : dict(sep=";", encoding= "unicode_escape", header = 0, skiprows=[0], usecols=[0,2,4], names =["ts","CO2", "p"])    }
-
-    , to_datetime_settings = {"off" : dict(format = "%d.%m.%Y %H:%M", exact= False, errors = "coerce")
-    , "on": dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce")
-    , "CO2" : dict(format = "%d.%m.%Y %H:%M:%S", exact= False, errors = "coerce")   }
-
-    , calc_rate = ("on", "BASET")
+    , index_ts = None
+    , read_csv_settings = None
+    , to_datetime_settings = None
+    , calc_rate = None
     , endpoint = "end1"
     , read_excel_settings = None
+    , smooth = None
+    , kwargs_smooth = dict(halflife=5, adjust= False)   #Martins smoothing settings, you may need to adjust this.
 
     ):
        
@@ -152,9 +150,30 @@ class Experiment:
             self.time_filter(dskey, start, end)
         
         if calc_rate is not None:
-            self.calc_rate(*calc_rate)
+            self.derive(calc_rate)
         
-        
+        if smooth is not None:
+            self.ewm(smooth, kwargs_smooth)
+
+
+    def read_data(self, path, index_ts, read_csv_settings, to_datetime_settings):
+        """ Function to read the measurement data with the corresponding settings
+
+        :param path: Path of the measurement data.
+        :type path: str 
+        :param index_ts: Index of the timestamp column
+        :type index_ts: int
+        :param read_csv_settings: Pandas read_csv setings for this type of data.
+        :type read_csv_settings: dict
+        :param to_datetime_settings: Pandas to_datetime settings to convert timestamp column to pd.Timestamp
+        :type to_datetime_settings: dict
+        """
+
+        df = pd.read_csv(path, **read_csv_settings)
+        df["ts"] = pd.to_datetime(df.iloc[:, index_ts], **to_datetime_settings)
+        assert not df.empty, "The Dataframe is empty"
+        return df    
+
     
     def time_filter(self, dskey, start = None, end = None):
         """Function to filter according to process time  
@@ -220,72 +239,123 @@ class Experiment:
 
 
 
-    def calc_rate(self, dskey, col):
+    def derive(self, calc_rate):
         """ Function to calculate the time derivative of a variable with finite differences.
 
-        :param dskey: Dataset key correspond to one of the measuring types (e.g. "off" , "CO2")
-        :type dskey: dict key
-        :param col: Column in dataframe = variable for calculating the rate
-        :type col: str
+        :param calc_rate_dict: dict with keys corresponding the measuring types (e.g. "on" , "CO2") and value corresponding to the columns to be derived e.g. [BASET, ACID].
+        :type calc_rate_dict: dict
         :return: New column in dataframe named col_rate = time derivative of col.
 
         """
 
-        df = self.dataset[dskey]
+        assert type(calc_rate) is dict, "calc_rate needs to of type 'dict' not of type '{0}'".format(type(calc_rate)) 
+        for typ, columns  in calc_rate.items():
 
-        try:
-            df[col + "_rate"] = df[col].diff() / np.diff(df.index, prepend= 1)
-        
-        except:
-            df[col] = pd.to_numeric(df[col] , downcast="float" , errors="coerce") # some values in BASET were recognized as string
-            df[col + "_rate"] = df[col].diff() / np.diff(df.index, prepend= 1)
+            assert typ in self.dataset.keys(), "The given typ {0} must be in the data".format(typ)
+            assert type(columns) in [str, int, list, tuple, set], "The type of the desired columns which you want to derive, should be a str an int or an iterable (list, tuple, set) with str's or int's not '{0}'".format(type(columns))
+            df = self.dataset[typ]
 
-        self.dataset[dskey] = df
+            if type(columns) in (str, int):
+                columns = [columns]
+            for col in columns:
+                assert type(col) in (str, int), "The column names must be of type str or int not of type {0}".format(type(col))
 
-        
-    def read_data(self, path, index_ts, read_csv_settings, to_datetime_settings):
-        """ Function to read the measurement data with the corresponding settings
 
-        :param path: Path of the measurement data.
-        :type path: str 
-        :param index_ts: Index of the timestamp column
-        :type index_ts: int
-        :param read_csv_settings: Pandas read_csv setings for this type of data.
-        :type read_csv_settings: dict
-        :param to_datetime_settings: Pandas to_datetime settings to convert timestamp column to pd.Timestamp
-        :type to_datetime_settings: dict
-path
+                if col in df.columns:
+                    try:
+                        df[col + "_rate"] = df[col].diff() / np.diff(df.index, prepend= 1)
+                    
+                    except:
+                        df[col] = pd.to_numeric(df[col] , downcast="float" , errors="coerce") # some values in BASET were recognized as string
+                        df[col + "_rate"] = df[col].diff() / np.diff(df.index, prepend= 1)
+                else:
+                    warnings.warn("The col '{0}' is not in the data '{1}'".format(col, typ))
+
+                self.dataset[typ] = df
+
+    
+    def ewm(self, smooth, kwargs_smooth):
+        """ Function to smooth the values of a column by exponentially weighted calculations with 'pandas.DataFrame.ewm'.
+
+        :param smooth: dict with keys corresponding the measuring types (e.g. "on" , "CO2") and value corresponding to the columns to be smoothed e.g. [BASET, ACID].
+        :type smooth: dict
+        :param kwargs_smooth: kwargs to be used in 'pandas.DataFrame.ewm'
+        :type kwargs_smooth: dict
+        :return: New column in dataframe named col_smoothed = with smoothed values.
+
         """
 
-        df = pd.read_csv(path, **read_csv_settings)
-        df["ts"] = pd.to_datetime(df.iloc[:, index_ts], **to_datetime_settings)
-        assert not df.empty, "The Dataframe is empty"
-        return df
+        assert type(smooth) is dict, "smooth needs to of type 'dict' not of type '{0}'".format(type(smooth)) 
+        for typ, columns  in smooth.items():
+
+            assert typ in self.dataset.keys(), "The given typ {0} must be in the data".format(typ)
+            assert type(columns) in [str, int, list, tuple, set], "The type of the desired columns which you want to smooth, should be a str an int or an iterable (list, tuple, set) with str's or int's not '{0}'".format(type(columns))
+            df = self.dataset[typ]
+
+            if type(columns) in (str, int):
+                columns = [columns]
+            for col in columns:
+                assert type(col) in (str, int), "The column names must be of type str or int not of type {0}".format(type(col))
+
+                if col in df.columns:
+                    df[col+ "_smoothed"] = df[col].ewm(**kwargs_smooth).mean()
+                else:
+                    warnings.warn("The col '{0}' is not in the data '{1}'".format(col, typ))
+
+                self.dataset[typ] = df
+    
+    def drop_col(self, col_info):
+        """ Function to drop columns from pd.DataFrame of specific type on axis = 1.
+
+        :param cols: dict with keys corresponding the measuring types (e.g. "on" , "CO2") and value corresponding to the columns to be dropped.
+        :type cols: dict
+        :return: New data with dropped columns.
+
+        """
+        assert type(col_info) is dict, "col_info needs to of type 'dict' not of type '{0}'".format(type(col_info)) 
+        for typ, columns  in col_info.items():
+
+            assert typ in self.dataset.keys(), "The given typ {0} must be in the data".format(typ)
+            assert type(columns) in [str, int, list, tuple, set], "The type of the desired columns which you want to drop, should be a str an int or an iterable (list, tuple, set) with str's or int's not '{0}'".format(type(columns))
+            df = self.dataset[typ]
+
+            if type(columns) in (str, int):
+                columns = [columns]
+            for col in columns:
+                assert type(col) in (str, int), "The column names must be of type str or int not of type {0}".format(type(col))
+                
+                if col in df.columns:
+                    df.drop(col, axis = 1, inplace = True)
+                else:
+                    warnings.warn("The col '{0}' is not in the data '{1}'".format(col, typ))
+
+                self.dataset[typ] = df
+
 
 
     def pop_dataframe(self, types):
         """Function to delete whole dataframes from the dataset, either of one or several types.
 
             :param types: Type of the measurement data.
-            :type types: str or list of str's
+            :type types: str or iterable with str`s (list, tuple, set).
             :return: Dataset without specific selected dataframe/s.
         """
 
-        if type(types) is list:
+        if type(types) in [list, tuple, set]:
             for typ in types:
                 if typ in self.dataset.keys():
                     self.dataset.pop(typ)
                     
                 else: 
-                    raise ValueError("Given types must be in the dataset")
+                    warnings.warn("The type '{0}' must be in the dataset".format(typ))
 
         elif type(types) is str:
             if types in self.dataset.keys():
                 self.dataset.pop(types)
 
             else:
-                raise ValueError("Typ must be in the dataset")
+                warnings.warn("The type '{0}' must be in the dataset".format(types))
         else:
-            raise TypeError("Type of types must be a str or a list of strings")
+            raise TypeError("Type of types must be a str or a list, tuple or np.ndarray with strings")
 
 

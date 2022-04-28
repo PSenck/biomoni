@@ -1,16 +1,16 @@
 ##Settings for MFCS_mimic, Data_collector, Laborloop routine,
-#This is the Settings script for the 1. MFCS_mimic, 2. Data_collector, 3. Laborloop routine, the first thing you have to do when you start is to adapt your paths (Simulation_path and Result_path)
+#This is the Settings script for the 1. MFCS_mimic, 2. Data_collector, 3. Laborloop routine, the first thing you have to do when you start is to adapt your paths (Exp_path and Result_path)
 #Linux
-Simulation_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten" #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Simulation_path
+Exp_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten" #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Exp_path
 Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
 
-#Windows 
-Simulation_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Simulation_path
-Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"    #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
+# #Windows 
+# Exp_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Exp_path
+# Result_path = r"P:\Code\biomoni\Messdaten\OPCUA"    #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
 
 
 
-exp_id = "F7"   #The Experiment to simulate, within Simulation_path
+exp_id = "F7"   #The Experiment to simulate, within Exp_path
 data_name = "data.csv"        #name of the csv file in which data will be saved
 sample_interval = 60    #Time in sec in which a measured value is generated (server) or a measured value is read (client). 
 
@@ -26,10 +26,31 @@ kwargs_experiment = {       #setting to create Experiment object
     index_ts = {"on_CO2" : 0},
     read_csv_settings = {"on_CO2" : dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")},
     to_datetime_settings = {"on_CO2" : dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce") },
-    calc_rate =("on_CO2", "BASET"),
+    calc_rate =dict(on_CO2 = "BASET"),
     read_excel_settings = dict(engine = "odf")
 
-    )
+),
+
+"offline_est" : dict(meta_path = "metadata.xlsx"
+    , types = {"off" : "offline.csv", "on": "online.CSV", "CO2" : "CO2.dat"}
+    , exp_dir_manual = None
+    , index_ts = {"off" : 0, "on": 0, "CO2" : 0}
+
+    , read_csv_settings = { "off" : dict(sep=";", header = 0, usecols = None)
+    , "on": dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")
+    , "CO2" : dict(sep=";",header = 0, skiprows=[0], usecols=[0,2,4], names =["ts","CO2", "p"])    }
+
+    , to_datetime_settings = {"off" : dict(format = "%d.%m.%Y %H:%M", exact= False, errors = "coerce")
+    , "on": dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce")
+    , "CO2" : dict(format = "%d.%m.%Y %H:%M:%S", exact= False, errors = "coerce")   }
+
+    , calc_rate = {"on" : "BASET"}
+    , endpoint = "end1"
+    , read_excel_settings = None
+    , smooth = {"on" : "BASET_rate"}
+    , kwargs_smooth = dict(halflife=3, adjust= False)
+)
+
 }
 
 kwargs_estimate = {         #settings to estimate
@@ -73,7 +94,7 @@ ts = ('ns=2;s="Value_PDatTime"',"Value",0)
 
 #Root identity: this is useful to get the values directly from the root node through root.get_child. This is used in the data collector.
 #to get the value of the structure directly through all vraiebles created above (units, variables)
-#Martins Anmerkung: überall statt 0: 2: um die Anpassung von python UA Server auf OPCUA-server von MFCS zu machen
+#Martins Anmerkung: überall statt 0: 2: um die Anpassung von python UA Server auf OPCUA-server von MFCS zu machen (außer bei Objects da bleibt 0)
 #Meine Anmerkung: überall steht Value+Variable nur bei BASET_2, CO2, CO2_pressure und PDatTime steht nur Value....
 
 nID_HM_4 = {

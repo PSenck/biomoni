@@ -1,2 +1,2 @@
 # Here are some examples of how to use the biomoni package
-To understand the package the `offline_estimation` examples should be looked at first
+With the `biomoni` package, an offline estimation or an online estimation can be made. The offline estimation is based on historical measured data. The online estimation is an ongoing estimation based on a process that is currently running, it works with automatically measured signals and gives an output "online" while the data is recorded. To understand the `biomoni` package, do the `offline_estimation` first.

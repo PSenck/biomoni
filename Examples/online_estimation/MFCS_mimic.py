@@ -8,7 +8,7 @@ from biomoni.Experiment import Experiment
 from biomoni.Yeast import Yeast
 from biomoni.visualize import visualize
 
-from settings import Simulation_path, exp_id, units_id, variables_id, values_id, url, sample_interval
+from settings import Exp_path, exp_id, units_id, variables_id, values_id, url, sample_interval, kwargs_experiment
 import numpy as np
 from scipy import integrate
 from opcua import Server
@@ -20,8 +20,8 @@ import plotly.express as px
 
 
 ##Simulate an Experiment by using the metadata from an real Experiment - F7 in thise case
-path = Simulation_path
-Exp = Experiment(path, exp_id)  #load experiment 
+path = Exp_path
+Exp = Experiment(path, exp_id, **kwargs_experiment["offline_est"])  #load experiment 
 y = Yeast()
 hours = 8
 t_grid = np.linspace(0,hours, hours*60)     #measuring times * 60 means 1 timepoint each minute

@@ -25,7 +25,10 @@ delimeter = ";"
 
 #azure specific settings
 #Azure Files
-connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+#To create a Environmental variable that contains the connection string do the following: Linux/macOS: export STORAGE_CONNECTION_STRING="<yourconnectionstring>"
+#Windows: setx STORAGE_CONNECTION_STRING "<yourconnectionstring>"
+#you could also write the connection string here out as string but dont load it on Github, otherwise foreign people could abuse it
+connection_string = os.getenv("STORAGE_CONNECTION_STRING")
 share_name = "biomoni-storage"
 azure_exp_file_path = "Measurement-data/current_ferm/data.csv"
 kwargs_push_azure_file = dict(connection_string = connection_string, share_name = share_name, azure_file_path = azure_exp_file_path)

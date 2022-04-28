@@ -43,6 +43,13 @@ def visualize(data_1, data_2 = None, title = None
     :type mode_2: str, optional
     :param secondary_y_cols: list of column names which should be displayed on the secondary y axis
     :type secondary_y_cols: list, optional
+    :param yaxis_type: "linear" or "log" on primary y_axis
+    :type yaxis_type: str
+    :param sec_yaxis_type: "linear" or "log" on secondary y_axis
+    :type sec_yaxis_type: str
+    :param layout_kwargs: keyword arguments for make_subplots.update_layout
+    type layout_kwargs: keyword arguments
+
 
     :return: Graph with plotted and named data
 
