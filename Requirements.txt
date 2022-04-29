@@ -15,3 +15,7 @@ diskcache
 multiprocess 
 psutil
 
+#for OPCUA
+opcua
+
+nbformat>=4.2.0
