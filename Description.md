@@ -2,7 +2,7 @@
 
 Create new anaconda environment (optional for other env than conda base):
 
-`conda create –name Biomonitoring python`
+`conda create --name Biomonitoring python`
 
 Activate environment
 
