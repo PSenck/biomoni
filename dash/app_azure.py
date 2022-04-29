@@ -1,9 +1,11 @@
-
 from biomoni import Experiment, Yeast
 from biomoni import visualize
 from biomoni.file_manager import pull_azure_file
+import os
+import plotly.express as px
 
 import os
+import difflib
 import numpy as np
 import pandas as pd
 
@@ -18,18 +20,22 @@ from settings_dash import kwargs_experiment, kwargs_estimate, Variables
 import json
 
 
+#This code has to be adapted
+########################################
 #download data from Azure
+# #To create a Environmental variable that contains the connection string do the following: Linux/macOS: export STORAGE_CONNECTION_STRING="<yourconnectionstring>"
+# #Windows: setx STORAGE_CONNECTION_STRING "<yourconnectionstring>", for development purposes you can also write out the connection string but dont puplish it since people could do harm with it.
+
 connection_string = os.getenv("STORAGE_CONNECTION_STRING")
+connection_string = "DefaultEndpointsProtocol=https;AccountName=biomonistorage;AccountKey=hwA0oCscA7HbTxYvkyainLR/5WrVk3lBkfsiCTJEbQCTAur5BHddOVnRxJlgt0iSxqxufqBmQUZvGCk3epXXBQ==;EndpointSuffix=core.windows.net"
 share_name = "biomoni-storage"
 azure_exp_file_path = "Measurement-data/current_ferm/data.csv" 
 azure_metadata_file_path = "Measurement-data/metadata_OPCUA.ods"
-[pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= i) for i in [azure_exp_file_path, azure_metadata_file_path]]
-
 
 
 #select your variables to be displayed
-measurement_vars = Variables["typ1"]["measurement_vars"]        #typ2
-simulated_vars = Variables["typ1"]["simulated_vars"]
+measurement_vars = Variables["typ1"]["measurement_vars"]    #all possible measurement variables (shown in the diagram)
+simulated_vars = Variables["typ1"]["simulated_vars"]        #all possible simulated variables (shown in the diagram)
 
 #This code block are asignments, in order to work with your individual data, use your Experiment class and the respective options to run their constructors
 Exp_class = Experiment      #assign your Experiment class to Exp_class
@@ -37,48 +43,65 @@ model_class = Yeast         #assign your Model class to model_class
 experiment_options = kwargs_experiment["typ1"]       #use ur options to create an Experiment
 estimation_options = kwargs_estimate["typ1"]         #use ur options to estimate
 
-#Using on, off, CO2 data from F7
+
+
 path = "Measurement-data"
+
 
 
 all_vars = set([*measurement_vars, *simulated_vars])    #All variables only once, used to display the options in the dropdown at the initial callback
 
-#color dict to style your layout
-colors = {
-    "background": "oxy",
-    "text": "green",
-    "settings" : "lightyellow",
-    "table_header" : "red",
-    "table_background" : "grey"
-}
 
+colors = {
+    "background": "#383434",
+    "text": "#f0ffff",
+    "settings" : "#474a50",
+    "table_header" : "#3a3f4b",
+    "table_background" : "#474a50",
+    "dropdown_background" : "black",
+    "dropdown_text" : "white"
+}
+#This code should always work
+##########################################
 
 #Create dash app
 dash_app = dash.Dash(__name__)     #external_stylesheets = external_stylesheets      #, long_callback_manager = long_callback_manager
 app = dash_app.server
 
-def generate_table(dataframe, no_cols = []):         
-    "Function to create a HTML table from pandas dataframe"
-    columns = [col for col in dataframe.columns if col not in no_cols]
-    return html.Table([
-        html.Thead(
-            html.Tr([html.Th(col) for col in columns])
-        ),
-        html.Tbody([
-            html.Tr([
-                html.Td(dataframe.iloc[i][col]) for col in columns
-            ]) for i in range(len(dataframe))       #, style = {"color" : colors["text"]}
-        ])
-    ])
+#Naming
+p_fullnames = model_class.p_full_names    #required to convert short param names to fullnames in datatable (update_table_params callback)
+p_fullnames_revert = {val: key for key,val in p_fullnames.items()} #required to convert names back to short names to perform operations (create_data callback)
 
+#Errors
+data_error_messages = ["The Dataframe is empty", "`first_step` exceeds bounds.", "The length of the data points in the measurement data is smaller than the number of the fit parameters with vary == True"]
+Azure_error_messages = ["The specified parent path does not exist.", "The specified share does not exist.", "urllib3.connection.HTTPSConnection", "'NoneType' object has no attribute 'rstrip'"]
+
+#style = {"backgroundColor": colors["background"], "color" : colors["text"], "textAlign": "center"}, id = "initial_message",
+initial_start_message =  html.Div(children = ["Please wait, the initial steps are being executed"])
+
+after_initial_callback_message = html.Div(children= ["A web application framework for your data.", 
+        #dcc.Markdown("""For more information visit [biomoni](https://github.com/PSenck/biomoni)""", style = {"backgroundColor": colors["background"]})
+        ])
 
 #Layout
-dash_app.layout = html.Div(style={"backgroundColor": colors["background"]}, children=[
+dash_app.layout = html.Div(style={"backgroundColor": colors["background"], "height" : "100vh","width" : "100%",'padding': "1px", "margin" : "1px", 'margin-left' : "1px", 'margin-top' : "1px"}, children=[
+
+
+    html.H1(
+        children= "Biomonitoring Dashboard",
+        style={
+            "textAlign": "center",
+            "color": colors["text"]
+        }
+    ),
+    html.Div(style = {"backgroundColor": colors["background"], "color" : colors["text"], "textAlign": "center"}, id = "initial_message",children = [initial_start_message]),
+
+
 
     html.Div(id = "Error_div", children = [
-        html.H2("Something went wrong, an error occurred within the 'create_data' callback with the following description:"),
-        html.Div(children = [], id = "Errormessage"),
-        html.Button(id="button_error", children="Try again", style = {"color": colors["text"],"backgroundColor" : colors["settings"]}),
+        html.H2("Something went wrong, an error occurred within the 'create_data' callback with the following description:", style={"color": colors["text"]}),
+        html.Div(children = [], id = "Errormessage", style = {"color" : colors["text"]}),
+        html.Button(id="button_error", children="Try again", style = {"color": colors["text"],"backgroundColor" : colors["settings"], "margin-top" : 10}),
         html.P(id="error_clicks", children=["Button not clicked"], style = {"color": colors["text"],"backgroundColor" : colors["settings"]}),
     ], style = {"display" : "None", "textAlign": "center", "backgroundColor" : colors["settings"]} ),
 
@@ -92,21 +115,6 @@ dash_app.layout = html.Div(style={"backgroundColor": colors["background"]}, chil
 
         dcc.Store(id = "data_store"),
 
-        html.H1(
-            children= "Biomonitoring Dashboard",
-            style={
-                "textAlign": "center",
-                "color": colors["text"]
-            }
-        ),
-
-        html.Div(children= ["A web application framework for your data.", 
-            #dcc.Markdown("""For more information visit [biomoni](https://github.com/PSenck/biomoni)""")     #htlm.A geht auch für link
-            ], style={
-            "textAlign": "center",
-            "color": colors["text"]
-        }),
-
         html.Br(),
 
         html.Div([
@@ -118,6 +126,7 @@ dash_app.layout = html.Div(style={"backgroundColor": colors["background"]}, chil
                     options=[{'label': i, 'value': i} for i in measurement_vars],
                     value = measurement_vars ,
                     multi = True,
+                    style = {"backgroundColor" : colors["settings"]}    #here
             
                 ),
                 html.Div("Displayed variables of simulated data", style =  {"color" : colors["text"]}),
@@ -126,6 +135,7 @@ dash_app.layout = html.Div(style={"backgroundColor": colors["background"]}, chil
                     options=[{'label': i, 'value': i} for i in simulated_vars],
                     value = [],
                     multi = True,
+                    style = {"backgroundColor" : colors["settings"]}    #here
             
                 ),
                 
@@ -146,7 +156,9 @@ dash_app.layout = html.Div(style={"backgroundColor": colors["background"]}, chil
                     id='secondary_yaxis',
                     options=[{'label': i, 'value': i} for i in all_vars],
                     value =  [],
-                    multi = True
+                    multi = True,
+                    style = {"backgroundColor" : colors["settings"]}        #here
+    
                 ),
             
 
@@ -162,62 +174,100 @@ dash_app.layout = html.Div(style={"backgroundColor": colors["background"]}, chil
 
         dcc.Graph(
             id = "graph1",
-            figure={} 
+            figure= px.scatter().update_layout(paper_bgcolor= colors["background"], plot_bgcolor= colors["background"], font_color= colors["text"])
 
         ),
-
+        
         html.Div([
-        html.Button(id = "options_button", children = "Show options", style={'display': 'inline-block', 'vertical-align': 'middle',"min-width": "150px",
-            'height': "25px",
-            "margin-top": "0px",
-            "margin-left": "5px",
-            "color": colors["text"],
-            "backgroundColor" : colors["settings"]}),
-        ], style = {"textAlign": "center"}),
+            html.Div("Simulation time in hours: ", style =  {"color" : colors["text"]}),
 
+            dcc.Input(id= "sim_time", value= 10, type='number', style = {"backgroundColor" : colors["settings"], "color" : colors["text"]}),  #here      #, style = {"backgroundColor" : colors["settings"], "color" : colors["text"]}
 
-        html.Div(id = "options_div", children = [
+        ], style = {"backgroundColor" : colors["background"], "margin-bottom": "30px"}),            
+
+        dcc.Loading( id = "loading_1", type = "default", children = [  
             html.Div([
-                html.Div("Simulation time in hours: ", style =  {"color" : colors["text"]}),
-                dcc.Input(id= "sim_time", value= 10, type='number'),
-            ], style = {"backgroundColor" : colors["settings"], "margin-bottom": "30px"}),
+                html.Button(id = "options_button", children = "Show options", style={'display': 'inline-block', 'vertical-align': 'middle',"min-width": "150px",
+                    'height': "25px",
+                    "margin-top": "0px",
+                    "margin-left": "5px",
+                    "color": colors["text"],
+                    "backgroundColor" : colors["settings"]}),
+            ], style = {"textAlign": "center"}),
 
-            html.Div([
-
-                html.Div([
-                    html.Div("Manual parameter estimation", style =  {"color" : colors["text"], "margin-bottom": "10px"}),
-                    html.Button(id="button_id", children="Estimate!", style = {"color": colors["text"],"backgroundColor" : colors["settings"]}),
-                    html.Div([html.P(id="paragraph_id", children=["Button not clicked"], style = {"color": colors["text"],"backgroundColor" : colors["settings"]})]),
-
-            ], style={'width': '48%', 'display': 'inline-block'}),
-
-                html.Div([
-                    html.Div("Automatic parameter estimation", style =  {"color" : colors["text"]}),
-                    dcc.RadioItems(
-                        id= "automatic_parest",
-                        options=[{'label': i, 'value': i} for i in ['enabled', 'disabled']],
-                        value= "enabled",
-                        labelStyle={'display': 'inline-block'},
-                        style = {"color" : colors["text"]} )
-
-                ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
-                
-            ], style = {"backgroundColor" : colors["settings"]}),
             
+            html.Div(id = "options_div", children = [
 
-            dash_table.DataTable(
-                id="table_params",
-                columns= [],             
-                data= [],     
-                style_header={
-                "color" : colors["text"],
-                'backgroundColor': colors["table_background"],
-                'fontWeight': 'bold'},
-            ),
+                html.Div([
 
-            html.Div("This is before any iterations of dcc.Interval", id = "iteration_identifier")
-        ], style = {}),
-        ], style = {})
+                    html.Div([
+                        html.Div("Manual parameter estimation", style =  {"color" : colors["text"], "margin-bottom": "10px"}),
+                        html.Button(id="button_id", children="Estimate", style = {"color": colors["text"],"backgroundColor" : colors["settings"]}),
+                        html.Div([html.P(id="paragraph_id", children=["Button not clicked"], style = {"color": colors["text"],"backgroundColor" : colors["settings"]})]),
+
+                    ], style={'width': '48%', 'display': 'inline-block'}),
+
+                    html.Div([
+                        html.Div("Automatic parameter estimation", style =  {"color" : colors["text"]}),
+                        dcc.RadioItems(
+                            id= "automatic_parest",
+                            options=[{'label': i, 'value': i} for i in ['enabled', 'disabled']],
+                            value= "enabled",
+                            labelStyle={'display': 'inline-block'},
+                            style = {"color" : colors["text"]} )
+
+                    ], style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
+                    
+                ], style = {"backgroundColor" : colors["settings"]}),
+
+                dash_table.DataTable(
+                    
+                    id="table_params",
+                    columns= [],             
+                    data= [],
+
+                    style_cell={"color" : colors["text"], "backgroundColor" : colors["background"]},  
+
+                    style_header={
+                    "color" : colors["text"],
+                    'backgroundColor': colors["table_background"],
+                    'fontWeight': 'bold',
+                    "textAlign" : "left"},
+                    
+                    style_cell_conditional=[
+                        {
+                            'if': {'column_id': "vary"},
+                            'textAlign': 'center',
+                            #"width": "10%"
+
+                        },
+                        {
+                            'if': {'column_id': "name"},
+                            'textAlign': 'left',
+                            "width": "10%"
+
+                        }  
+                    ],
+
+                    css=[
+
+                        {
+
+                            "selector":
+                            ".dash-spreadsheet-container .Select-value-label",
+                            "rule": "color: {}".format(colors["text"])                      
+
+                        },
+                    ],
+
+                ), 
+
+                html.Div("This is before any iterations of dcc.Interval", id = "iteration_identifier", style = {"color" : colors["text"]} )
+            ], style = {}),
+        ]) 
+    ], style = {"display" : "None"})
+        
+
 ])
 
 
@@ -279,14 +329,16 @@ def update_graph_1(jsonified_data, meas_vars, sim_vars, secondary_yaxis, yaxis_t
             [cols_measured.append(i) for i in list(measured_data[typ].columns)]
 
         
-        fig = visualize(measured_data, simulated_data,  secondary_y_cols= secondary_yaxis, yaxis_type = yaxis_type, sec_yaxis_type = secondary_yaxis_type )
+        fig = visualize(measured_data, simulated_data,  secondary_y_cols= secondary_yaxis, yaxis_type = yaxis_type, sec_yaxis_type = secondary_yaxis_type
+        , paper_bgcolor= colors["background"], plot_bgcolor= colors["background"], font_color= colors["text"], title_x= 1) #for complete trasnaprency : paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor= colors["background"]
+        
         all_columns = set(cols_measured + list(simulated_data.columns))
         options_sec_y=[{'label': i, 'value': i} for i in all_columns]
 
   
 
     else:
-        fig = {}
+        fig = px.scatter().update_layout(paper_bgcolor= colors["background"], plot_bgcolor= colors["background"], font_color= colors["text"])
         options_sec_y = [{'label': i, 'value': i} for i in all_vars]
     
     
@@ -304,25 +356,27 @@ def update_table_params(jsonified_data):
     params = data["params"]
     if params:      #check if list is empty
         params = pd.DataFrame(params).T
+        [params.replace(i, p_fullnames[i], inplace = True) for i in params["name"].values if i in p_fullnames.keys()]   #rename from short names to fullnames to display in table
         col_names = []
         for col in params.columns:
             editable_flag = col in ["vary", "min", "max", "value"]
             column_type = "numeric" if col not in ["vary", "name"] else "text" 
             #presentation = "dropdown" if col in ["vary"] else None
             if col in ["vary"]:
-                dic = {"name": col, "id": col, "editable" : editable_flag, "type": column_type, "format" : Format(precision=5), "presentation": "dropdown"}    #, 'presentation': 'dropdown'
+                dic = {"name": col, "id": col, "editable" : editable_flag, "type": column_type, "format" : Format(precision=5), "presentation": "dropdown" }    #, 'presentation': 'dropdown'
             else: 
                 dic = {"name": col, "id": col, "editable" : editable_flag, "type": column_type, "format" : Format(precision=5)}
             
-            dropdown={
-                'vary': {
-                    'options': [
-                        {'label': str(i), 'value': str(i)}
-                        for i in params['vary'].unique()
-                    ]
-                , "clearable" : False } }        
             col_names.append(dic)
-
+        dropdown={
+            'vary': {
+                'options': [
+                    {'label': str(i), 'value': str(i)}
+                    for i in params['vary'].unique()
+                ]
+            , "clearable" : False 
+            }
+        } 
 
         return col_names, params.to_dict("records"), dropdown
     else:
@@ -336,6 +390,7 @@ Output("iteration_identifier", "children"),
 Output("paragraph_id", "children"),
 Output("error_clicks", "children"),
 Output("Errormessage", "children"),
+Output("initial_message", "children"),
 Input("interval", "n_intervals"),
 Input("sim_time", "value"),
 Input("button_id", "n_clicks"),
@@ -357,8 +412,10 @@ def create_data(n_intervals, hours, n_clicks, n_clicks_error, parest_mode, data,
     
 
     if last_input == "" or last_input == "button_error" or Errormessage != "None":        #
-        pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= azure_exp_file_path)
+
         try:
+            
+            [pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= i) for i in [azure_exp_file_path, azure_metadata_file_path]] #load mata data and measurement data from azure
             Exp = Exp_class(path, **experiment_options)
             y = model_class()
             y.estimate(Exp, **estimation_options)
@@ -369,10 +426,12 @@ def create_data(n_intervals, hours, n_clicks, n_clicks_error, parest_mode, data,
 
     elif last_input != '':
         try:
-            pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= azure_exp_file_path)
+            
+            pull_azure_file(connection_string= connection_string, share_name= share_name, azure_file_path= azure_exp_file_path) #load measurement data from azure
             Exp = Exp_class(path, **experiment_options)
             y = model_class()
             params = pd.DataFrame(data, columns=[c['name'] for c in columns]).set_index("name")
+            [params.rename(index = {i : p_fullnames_revert[i]}, inplace= True) for i in params.index if i in p_fullnames_revert.keys()] 
             for p, row in params.iterrows():
                 if row["vary"] in ["True", "true"]: 
                     row["vary"] = True
@@ -429,12 +488,20 @@ def create_data(n_intervals, hours, n_clicks, n_clicks_error, parest_mode, data,
         "params" : {}
         }
 
+        if any(difflib.SequenceMatcher(None, str(Errormessage)[0:len(i)], i ).ratio() >0.7 for i in data_error_messages):
+            Errormessage = "There may be not enough measurement datapoints to perform a parameter estimation. The Errormessage is: {}".format(Errormessage)
+        
+        elif any(difflib.SequenceMatcher(None, str(Errormessage)[0:len(i)], i ).ratio() >0.7 for i in Azure_error_messages):
+            Errormessage = "There are problems with the connection to Azure, did you use the right connection string? Are the data available on Azure? The Errormessage is: {}".format(Errormessage)
 
-    return json.dumps(all_data), iteration_nr, [f"Clicked {n_clicks} times"], [f"Clicked {n_clicks_error} times"], str(Errormessage)
+
+
+
+    return json.dumps(all_data), iteration_nr, [f"Clicked {n_clicks} times"], [f"Clicked {n_clicks_error} times"], str(Errormessage), after_initial_callback_message
 
 
 if __name__ == "__main__":
-    dash_app.run_server(debug = True, host='0.0.0.0', port='8000')     #für windows: debug=False, host='localhost' , host="0.0.0.0" 
-
+    #dash_app.run_server(debug = True, host='0.0.0.0', port='8000')     #Linux comment only one in or out
+    dash_app.run_server(debug = False, host='localhost', port='8000')   #windows
 
 

@@ -6,7 +6,7 @@ Just a collection of different parameter values that can be loaded into the resp
 from lmfit import Parameters
 
 
-#Parameter for MFCS mimick simulation
+#Parameter for MFCS mimick simulation, this are the parameters to create the artificial data saved later in 'Result_path'
 p0 = Parameters()
 p0.add("qsmax", value= 1.61290497, min=0.01, max=5.0 , vary = True)     #Maximum glucose uptake rate [g/(g*h)]   #previous start val: 0.1  #estimated value: 1.61290497
 p0.add("qemax", value=0.2361, min=0.15, max=0.35, vary=False)    #Maximum ethanol uptake rate [g/(g*h)]       #value=0.2361, min=0.15, max=0.35, vary=True # value=0.05, min=0.001, max=0.5,  vary=True geht
@@ -33,7 +33,7 @@ p0.add("NX", value=0.15, min=0.14, max=0.16, vary=False) #Stoichiometric nitroge
 p0.add("g_e", value=0.21636282532087284, min=0.17624196916440354, max=0.2883951412907231, vary=False) #determined experimentally: formation glycerol per ethanol [g/g]
 
 
-#Parameters to start with in laborloop.py, they differ from p0 to demonstrate that the parameter estimation works
+#Parameters to start with in laborloop.py, they differ from p0 to demonstrate that the parameter estimation works. parameters are changed to see if we can find p0 again.
 p1 = Parameters()
 p1.add("qsmax", value= 1.63, min= 1.5, max=1.7 , vary = True)     #Maximum glucose uptake rate [g/(g*h)]   #previous start val: 0.1  #estimated value: 1.61290497
 p1.add("qemax", value=0.2361, min=0.15, max=0.35, vary=False)    #Maximum ethanol uptake rate [g/(g*h)]       #value=0.2361, min=0.15, max=0.35, vary=True # value=0.05, min=0.001, max=0.5,  vary=True geht

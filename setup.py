@@ -13,6 +13,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     project_urls={
-        "Main_repo": "https://github.com/PSenck/Biomonitoring",
+        "Main_repo": "https://github.com/PSenck/biomoni",
     }
 )

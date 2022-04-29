@@ -24,14 +24,14 @@ kwargs_experiment = {       #setting to create Experiment object
     index_ts = {"on_CO2" : 0},
     read_csv_settings = {"on_CO2" : dict(sep=";",encoding= "unicode_escape",decimal=",", skiprows=[1,2] , skipfooter=1, usecols = None, engine="python")},
     to_datetime_settings = {"on_CO2" : dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce") },
-    calc_rate =("on_CO2", "BASET"),
+    calc_rate = {"on_CO2": "BASET"},
     read_excel_settings = dict(engine = "odf")
 
     ),
 
     "typ2": dict(
 
-    exp_id = "F7", meta_path = "metadata.xlsx"
+     meta_path = "metadata.xlsx"
     , types = {"off" : "offline.csv", "on": "online.CSV", "CO2" : "CO2.dat"}
     , index_ts = {"off" : 0, "on": 0, "CO2" : 0}
 
@@ -43,7 +43,7 @@ kwargs_experiment = {       #setting to create Experiment object
     , "on": dict(format = "%d.%m.%Y  %H:%M:%S", exact= False, errors = "coerce")
     , "CO2" : dict(format = "%d.%m.%Y %H:%M:%S", exact= False, errors = "coerce")   }
 
-    , calc_rate = ("on", "BASET")
+    , calc_rate = {"on" : "BASET"}
     , exp_dir_manual = None
     , endpoint = "end1"
     , read_excel_settings = None
@@ -55,7 +55,7 @@ kwargs_experiment = {       #setting to create Experiment object
 kwargs_estimate = {         #settings to estimate
 
     "typ1" : dict (
-    tau = 1, 
+    #tau = 1, 
     max_nfev = 40      #max function evaluations
     ),
 
