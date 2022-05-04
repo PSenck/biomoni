@@ -3,14 +3,6 @@ see the documentation [here](https://htmlpreview.github.io/?https://raw.githubus
 
 To install the package on your machine follow the instructions in [Description](Description.md)
 
-The Experiment class can read and pre-process data from different measurement devices in the lab.
+The `biomoni` package offers possibilities like pre-processing data from various measurement devices, creating simulations and estimating model parameters. It is possible to use the package for the purpose of offline estimations (estimations based on historical data)  or online estimations (estimations for processes that are currently running), whereby the process is mathematically interpreted at any time. With the `Experiment` class the measurement data of different instruments can be easily pre-processed and modified for each experiment. The `Model` class is the parent class of subclasses like `Yeast` (for Yeast Fermentations) which contain models to describe the process mathematically by differential equation systems. Based on the models and the pre-processed data, parameters can be estimated and simulations can be created. Those simulations can then be visualized in form of a dash web app which allows to give an insight in the future of your process. When will the substrate be empty? Which biomass will you have in 20 hours? Are the measured data deviating from the expected simulations? May the process be contaminated? Those questions can be answered with the `biomoni` package. 
 
-The Model class has basic functionalities for an parameter estimation based on simulated data and experimental data saved in the Experiment class.
-
-The Yeast class is derived from the Model class and contains the kinetic model for a yeast fed batch fermentation and a simulation routine.
-
-The visualization module can visualize simulated and experimental data.
-
-Examples for an off and online estimation are provided in the "Examples" folder. Real Measurement data are provided in the "Messdaten" Folder.
-
-The state of the process can be displayed with a dash board.
+Examples for an off and online estimation are provided in the `Examples` folder. Real measurement data are provided in the `example_data` folder. Follow the descriptions in the Readme.md files in each of the examples to understand the code. The dash app shows the beauty of the `biomoni` package in form of an interactive dashboard. This dashboard can also be implemented on a cloud system like Azure. The `file_manager` allows you to collect data in the laboratory and push them directly to Azure where they can be interpreted by the `biomoni` package.
