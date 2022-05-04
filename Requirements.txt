@@ -1,21 +1,38 @@
-numpy
-pandas
-scipy
-plotly
-lmfit
-sympy
-odfpy
-kaleido
+#biomoni package from PSenck/Github
+git+https://github.com/PSenck/biomoni.git#egg=biomoni
 
-#For dash 
 
-openpyxl
-dash
-diskcache 
-multiprocess 
-psutil
+#numeric packages
+lmfit==1.0.3
+numpy==1.22.3
+pandas==1.4.2
+scipy==1.8.0
+sympy==1.10.1
 
-#for OPCUA
-opcua
 
-nbformat>=4.2.0
+#visualizing
+plotly==5.7.0
+
+#Dash
+dash==2.3.1
+psutil==5.9.0
+diskcache==5.4.0
+multiprocess==0.70.12.2
+
+#Read data from Libre office calc odf file
+odfpy==1.4.1
+
+#For read Excel files
+openpyxl==3.0.9
+
+
+
+#Opcua
+opcua==0.98.13
+
+#Azure
+azure-core==1.23.1
+azure-storage-file-share==12.7.0
+
+#required for mac
+nbformat==5.3.0

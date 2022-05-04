@@ -3,7 +3,7 @@ see the documentation [here](https://htmlpreview.github.io/?https://raw.githubus
 
 To install the package on your machine follow the instructions in [Description](Description.md)
 
-The Experiment class can read and pre-process data from different measurement techniques in the lab.
+The Experiment class can read and pre-process data from different measurement devices in the lab.
 
 The Model class has basic functionalities for an parameter estimation based on simulated data and experimental data saved in the Experiment class.
 

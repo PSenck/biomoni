@@ -1,0 +1,39 @@
+#biomoni package from PSenck/Github
+git+https://github.com/PSenck/biomoni.git#egg=biomoni
+
+#calculating and data management
+numpy 
+pandas
+scipy
+lmfit
+sympy
+
+
+#Read Excel odf files
+openpyxl
+
+#Read odf files
+odfpy
+
+#save images
+psutil
+
+#visualizing
+plotly
+
+
+#Azure
+azure-storage-file-share
+
+#OPCUA
+opcua
+
+#Dash
+dash
+diskcache 
+multiprocess 
+psutil
+
+#MAC OS
+nbformat
+

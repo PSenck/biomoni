@@ -32,7 +32,7 @@ import traceback
 #Please comment only one of those options (1,2,3) in and the other options out
 
 # ######Option 1: Load from Azure##### comment in or out
-# # #To create a Environmental variable that contains the connection string do the following: Linux/macOS: export STORAGE_CONNECTION_STRING="<yourconnectionstring>"
+# # #To create a Environmental variable that contains the connection string do the following: Linux/macOS: export STORAGE_CONNECTION_STRING="<yourconnectionstring>" 
 # # #Windows: setx STORAGE_CONNECTION_STRING "<yourconnectionstring>", for development purposes you can also write out the connection string but dont puplish it since people could do harm with it.
 # load_from_azure = True #this is used later in the callbacks, if True data is pulled from Azure
 # path = "Measurement-data"
@@ -49,32 +49,32 @@ import traceback
 
 
 
-# ######Option 2: the automatically generated folder##### comment in or out
-# load_from_azure = False
-# Result_path = "../Examples/example_data/OPCUA"  
-# path = Result_path       
-# #This code block finds the path which was last modified within Result_path
-# sub_paths = next(os.walk(Result_path))[1]       #yields the subsirectory in the given path
-# newest_results_dir = max([os.path.join(Result_path,i) for i in sub_paths], key=os.path.getmtime) #gives newest subdirectory
-# exp_dir_manual = newest_results_dir     #manually given subdirectory with measurement data because exp_id does not match with the actual directory in this case
-# kwargs_experiment["typ1"]["exp_dir_manual"] = exp_dir_manual      #add the directory to the key word 
-# experiment_options = kwargs_experiment["typ1"]       
-# estimation_options = kwargs_estimate["typ1"] 
-# measurement_vars = Variables["typ1"]["measurement_vars"]        
-# simulated_vars = Variables["typ1"]["simulated_vars"]
-# ######Option 2: the automatically generated folder##### comment in or out
-
-
-
-######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
+######Option 2: the automatically generated folder##### comment in or out
 load_from_azure = False
-path = "../Examples/example_data"
-experiment_options = kwargs_experiment["typ2"]       
-estimation_options = kwargs_estimate["typ2"]  
-measurement_vars = Variables["typ2"]["measurement_vars"]        
-simulated_vars = Variables["typ2"]["simulated_vars"]
-experiment_options["exp_id"] = "F7"
-######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
+Result_path = "../Examples/example_data/OPCUA"  
+path = Result_path       
+#This code block finds the path which was last modified within Result_path
+sub_paths = next(os.walk(Result_path))[1]       #yields the subsirectory in the given path
+newest_results_dir = max([os.path.join(Result_path,i) for i in sub_paths], key=os.path.getmtime) #gives newest subdirectory
+exp_dir_manual = newest_results_dir     #manually given subdirectory with measurement data because exp_id does not match with the actual directory in this case
+kwargs_experiment["typ1"]["exp_dir_manual"] = exp_dir_manual      #add the directory to the key word 
+experiment_options = kwargs_experiment["typ1"]       
+estimation_options = kwargs_estimate["typ1"] 
+measurement_vars = Variables["typ1"]["measurement_vars"]        
+simulated_vars = Variables["typ1"]["simulated_vars"]
+######Option 2: the automatically generated folder##### comment in or out
+
+
+
+# ######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
+# load_from_azure = False
+# path = "../Examples/example_data"
+# experiment_options = kwargs_experiment["typ2"]       
+# estimation_options = kwargs_estimate["typ2"]  
+# measurement_vars = Variables["typ2"]["measurement_vars"]        
+# simulated_vars = Variables["typ2"]["simulated_vars"]
+# experiment_options["exp_id"] = "F7"
+# ######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
 
 
 

@@ -36,6 +36,14 @@ biomoni.Yeast\_variable\_feedrate module
    :undoc-members:
    :show-inheritance:
 
+biomoni.file\_manager module
+----------------------------
+
+.. automodule:: biomoni.file_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 biomoni.visualize module
 ------------------------
 

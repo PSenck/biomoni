@@ -18,23 +18,34 @@ def OPCUA_collector(url, Result_path, data_name, cols_vs_id, root_ID, delimeter 
     , push_to_azure = False, kwargs_push_azure_file = None):
     """Function to collect values from OPCUA Server over the root ID and write them into a csv file.
 
-    Args:
+    Args:    
         url (str): url to connect to OPCUA Server.
+
         Result_path (str): place where to store the csv file.
+        
         data_name: name of the csv file itself.
+
         cols_vs_id (dict): dictionary with key: colum name in csv file and value: id of respective value in root_ID.
+
         root_ID (dict): root ID for different values returned by the OPCUA server.
 
 
 
     Kwargs:
         delimeter (str): separator to split columns.
+
         initial_row_filler (list of lists): will fill the first rows of the csv file (after the column names).
+
         sample_interval (int): sample interval in seconds.
+
         create_ts (bool): Create timestamp everytime OPCUA_collector is sampling (within evry loop iteration). Nevertheless it would be more acurate to use the timestamps given from the OPCUA Server directly (like PDatTime) instead of create on here.
+
         ts_format (str): Disired Time Format if create_ts is True.
+
         print_data_in_console (bool): show the sampled data as appending pd.DataFrame in the console (only for control pruposes).
+
         push_to_azure (bool): push the csv file directly to azure.
+
         kwargs_push_azure_file (dict): Keyword arguments for the function push_azure_file.
  
     """
@@ -105,6 +116,7 @@ def create_file_share(connection_string, share_name):
 
     Args:
         connection_string (str): connection string of your storage account in azure (Key 1)
+
         share_name (str): name of the file share you want to create
 
     
@@ -127,7 +139,9 @@ def create_directory(connection_string, share_name, dir_name, ignore_ResourceExi
     
     Args:
         connection_string (str): connection string of your storage account in azure (Key 1)
+
         share_name (str): name of existing file share where you want to create the directory
+
         dir_name: name of the directory you want to create
 
     Kwargs:
@@ -159,8 +173,11 @@ def push_azure_file(data, connection_string, share_name, azure_file_path):
 
     Args:
         data (file): data you want to upload. e.g. 'hello.txt'.
+        
         connection_string (str): connection string of your storage account in azure (Key 1)
+
         share_name (str): name of the file share 
+
         azure_file_path (str): path name of the file on azure e.g. 'storage/data/hello.txt'.
 
     """
@@ -244,8 +261,11 @@ def pull_azure_file(connection_string, share_name, azure_file_path, local_path =
 
     Args:
         connection_string (str): connection string of your storage account in azure (Key 1)
+
         share_name (str): name of the file share 
+
         azure_file_path (str): path name of the file on azure e.g. 'storage/data/hello.txt'.
+        
         local_path (str): name of the local file path e.g. /downloads/hello_downloaded.txt. If local_path is not given (=None), the local path will get the name of azure_file_path. if the directory does not exist one will be created. 
 
     """

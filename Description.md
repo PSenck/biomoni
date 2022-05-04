@@ -12,10 +12,10 @@ Copy the folder to your local drive
 
 To install the required packages: open directory in terminal and type:
 
-`pip install -r Requirements.txt`
+`pip install -r requirements.txt`
 
 For dash:
-`pip install -r Requirements_dash.txt`
+`pip install -r requirements_dash.txt`
 
 To install the package, open terminal in the directory and type:
 
