@@ -1,8 +1,8 @@
 ##Settings for MFCS_mimic, Data_collector, Laborloop routine,
 #This is the Settings script for the 1. MFCS_mimic, 2. Data_collector, 3. Laborloop routine, the first thing you have to do when you start is to adapt your paths (Exp_path and Result_path)
 #Linux
-Exp_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten" #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Exp_path
-Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA" #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
+Exp_path = "../example_data" #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Exp_path
+Result_path = "../example_data/OPCUA" #path where Results (data from MFCS) are stored. The path where data recorded by the opcua client (data_collector) is stored and also the data used for online estimation in laborloop.
 
 # #Windows 
 # Exp_path = r"P:\Code\biomoni\Messdaten"    #path in which the experiment to be simulated is located. For the MFCS_mimic simualted data is returned, this data was simulated based on real data present in Exp_path

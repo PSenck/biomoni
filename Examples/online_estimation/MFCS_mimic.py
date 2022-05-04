@@ -15,8 +15,6 @@ from opcua import Server
 import time
 from datetime import datetime
 from param_collection import p0
-import plotly.express as px
-
 
 
 ##Simulate an Experiment by using the metadata from an real Experiment - F7 in thise case

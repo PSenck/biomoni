@@ -31,28 +31,27 @@ import traceback
 
 #Please comment only one of those options (1,2,3) in and the other options out
 
-######Option 1: Load from Azure##### comment in or out
-# #To create a Environmental variable that contains the connection string do the following: Linux/macOS: export STORAGE_CONNECTION_STRING="<yourconnectionstring>"
-# #Windows: setx STORAGE_CONNECTION_STRING "<yourconnectionstring>", for development purposes you can also write out the connection string but dont puplish it since people could do harm with it.
-load_from_azure = True #this is used later in the callbacks, if True data is pulled from Azure
-path = "Measurement-data"
-connection_string = os.getenv("STORAGE_CONNECTION_STRING")
-connection_string = "DefaultEndpointsProtocol=https;AccountName=biomonistorage;AccountKey=hwA0oCscA7HbTxYvkyainLR/5WrVk3lBkfsiCTJEbQCTAur5BHddOVnRxJlgt0iSxqxufqBmQUZvGCk3epXXBQ==;EndpointSuffix=core.windows.net"
-share_name = "biomoni-storage"
-azure_exp_file_path = "Measurement-data/current_ferm/data.csv" 
-azure_metadata_file_path = "Measurement-data/metadata_OPCUA.ods"
-#select your variables to be displayed
-measurement_vars = Variables["typ1"]["measurement_vars"]    #all possible measurement variables (shown in the diagram)
-simulated_vars = Variables["typ1"]["simulated_vars"]        #all possible simulated variables (shown in the diagram)
-experiment_options = kwargs_experiment["typ1"]       #use ur options to create an Experiment
-estimation_options = kwargs_estimate["typ1"]         #use ur options to estimate
-######Option 1: Load from Azure##### comment in or out
+# ######Option 1: Load from Azure##### comment in or out
+# # #To create a Environmental variable that contains the connection string do the following: Linux/macOS: export STORAGE_CONNECTION_STRING="<yourconnectionstring>"
+# # #Windows: setx STORAGE_CONNECTION_STRING "<yourconnectionstring>", for development purposes you can also write out the connection string but dont puplish it since people could do harm with it.
+# load_from_azure = True #this is used later in the callbacks, if True data is pulled from Azure
+# path = "Measurement-data"
+# connection_string = os.getenv("STORAGE_CONNECTION_STRING")
+# share_name = "biomoni-storage"
+# azure_exp_file_path = "Measurement-data/current_ferm/data.csv" 
+# azure_metadata_file_path = "Measurement-data/metadata_OPCUA.ods"
+# #select your variables to be displayed
+# measurement_vars = Variables["typ1"]["measurement_vars"]    #all possible measurement variables (shown in the diagram)
+# simulated_vars = Variables["typ1"]["simulated_vars"]        #all possible simulated variables (shown in the diagram)
+# experiment_options = kwargs_experiment["typ1"]       #use ur options to create an Experiment
+# estimation_options = kwargs_estimate["typ1"]         #use ur options to estimate
+# ######Option 1: Load from Azure##### comment in or out
 
 
 
 # ######Option 2: the automatically generated folder##### comment in or out
 # load_from_azure = False
-# Result_path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten/OPCUA"  
+# Result_path = "../Examples/example_data/OPCUA"  
 # path = Result_path       
 # #This code block finds the path which was last modified within Result_path
 # sub_paths = next(os.walk(Result_path))[1]       #yields the subsirectory in the given path
@@ -67,15 +66,15 @@ estimation_options = kwargs_estimate["typ1"]         #use ur options to estimate
 
 
 
-# ######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
-# load_from_azure = False
-# path = "/home/paul/pCloudDrive/Code/biomoni/Messdaten"
-# experiment_options = kwargs_experiment["typ2"]       
-# estimation_options = kwargs_estimate["typ2"]  
-# measurement_vars = Variables["typ2"]["measurement_vars"]        
-# simulated_vars = Variables["typ2"]["simulated_vars"]
-# experiment_options["exp_id"] = "F7"
-# ######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
+######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
+load_from_azure = False
+path = "../Examples/example_data"
+experiment_options = kwargs_experiment["typ2"]       
+estimation_options = kwargs_estimate["typ2"]  
+measurement_vars = Variables["typ2"]["measurement_vars"]        
+simulated_vars = Variables["typ2"]["simulated_vars"]
+experiment_options["exp_id"] = "F7"
+######Option 3: Load the  measurement data from F4,F5,F6.F7 or F8##### comment in or out
 
 
 
@@ -96,6 +95,8 @@ colors = {
     "dropdown_background" : "black",
     "dropdown_text" : "white"
 }
+
+variables_and_colors = {"BASET_rate" : "cyan", "cX" : "red", "cS" : "green", "cE" : "blue", "CO2" : "orange"} #variables and colors for biomoni.visualize
 ######has to be adapted######
 
 
@@ -459,7 +460,7 @@ def update_graph_1(jsonified_data, meas_vars, sim_vars, secondary_yaxis, yaxis_t
             [cols_measured.append(i) for i in list(measured_data[typ].columns)]
 
         
-        fig = visualize(measured_data, simulated_data,  secondary_y_cols= secondary_yaxis, yaxis_type = yaxis_type, sec_yaxis_type = secondary_yaxis_type
+        fig = visualize(measured_data, simulated_data, column_dict= variables_and_colors ,secondary_y_cols= secondary_yaxis, yaxis_type = yaxis_type, sec_yaxis_type = secondary_yaxis_type
         , paper_bgcolor= colors["background"], plot_bgcolor= colors["background"], font_color= colors["text"], title_x= 1) #for complete trasnaprency : paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor= colors["background"]
         
         all_columns = set(cols_measured + list(simulated_data.columns))

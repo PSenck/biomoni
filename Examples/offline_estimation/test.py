@@ -6,12 +6,9 @@ import pandas as pd
 ################################################################################################################################################
 
 #adapt ypur path
-#Linux path
-path = "/home/paul/pCloudDrive/Code/Messdaten" 
 
-#windows path
-#path = r"P:\Code\biomoni\Messdaten"
-    
+path = "../example_data" 
+  
 kwags_exp = dict(meta_path = "metadata.xlsx"
     , types = {"off" : "offline.csv", "on": "online.CSV", "CO2" : "CO2.dat"}
     , exp_dir_manual = None

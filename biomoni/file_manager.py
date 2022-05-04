@@ -85,7 +85,7 @@ def OPCUA_collector(url, Result_path, data_name, cols_vs_id, root_ID, delimeter 
             writer.writerow(appendix)
 
         #just to show the data as pd.DataFrame
-        data = data.append(appendix, ignore_index=True) #append data row by row
+        data = data.append(appendix, ignore_index=True) #append data row by row #this may be deprecated in the future pandas versions, pandas suggest: do use pandas.concat
 
         if print_data_in_console is True:
             print(data)
